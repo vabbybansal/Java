@@ -1,11 +1,15 @@
 package tasku.apps.vaibhavbansal.tasku;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -24,8 +28,8 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        //Will have a menu and will recieve Menu Call Backs
-//        setHasOptionsMenu(true);
+        //Will have a menu and will recieve Menu Call Backs
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -33,7 +37,7 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_task_list, container, false);
 
-        //Wire up the RecyclerView
+        //Instantiate the Recycler view
         recyclerView =(RecyclerView) v.findViewById(R.id.id_recyclerView_task_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -50,12 +54,6 @@ public class TaskListFragment extends Fragment {
                 TaskLab taskLab = TaskLab.get(getActivity());
                 List<Task> allTasks = taskLab.getTasksFromDB();
 
-//                for(int i=0;i<10;i++){
-//                    Task task = new Task("Task - " + i, "Karle bhai nhi toh khatam hai bey tuu", new Date(),true, "Very High" );
-//                    dummyTasks.add(task);
-//
-//                }
-
                 taskAdapter = new TaskAdapter(allTasks);
                 recyclerView.setAdapter(taskAdapter);
 //        }
@@ -64,7 +62,7 @@ public class TaskListFragment extends Fragment {
 //            taskAdapter.notifyDataSetChanged();
 //        }
     }
-
+    //View Holder of the RecyclerView
     private class TaskHolder extends RecyclerView.ViewHolder{
 
         private TextView title;
@@ -90,6 +88,7 @@ public class TaskListFragment extends Fragment {
             priority.setText(task.getPriority());
         }
     }
+    //Adapter of the RecyclerView
     private class TaskAdapter extends RecyclerView.Adapter<TaskHolder>{
 
         private List<Task> allTasks;
@@ -125,4 +124,30 @@ public class TaskListFragment extends Fragment {
         }
     }
 
+
+    //Menu Options Override Functions
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_task_list_inbox, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+
+            case R.id.id_menu_item_new_task:
+                //Task newTask = new Task();
+                //TaskLab.get(getActivity()).addTask(newTask);
+                //Start a plain Detail Activity for creating a new Task
+                Intent intent = TaskDetailActivity.newIntentNoArgs(getActivity());
+                startActivity(intent);
+                return true;
+
+            default:return super.onOptionsItemSelected(item);
+        }
+
+
+    }
 }
