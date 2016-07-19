@@ -1,31 +1,35 @@
 package tasku.apps.vaibhavbansal.tasku;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by VAIBHAV on 7/17/2016.
  */
 public class Task {
+    private UUID uuid;
     private String title;
     private String description;
-    private Date date;
-    
-    private Boolean isDone;
+    private Date task_date;
     private String priority;
-
-    public Task(String title, String description, Date date, Boolean isDone, String priority) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.isDone = isDone;
-        this.priority = priority;
+    private Boolean is_done;
+    private Date date_created;
+    private Date date_done;
+    //constructors
+    public Task() {
+        this(UUID.randomUUID());
     }
 
-    public Task(String title, String description, Boolean isDone, String priority) {
-        this.title = title;
-        this.description = description;
-        this.isDone = isDone;
-        this.priority = priority;
+    public Task(UUID uuid) {
+        this.uuid = uuid;
+    }
+    //getter setter
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getTitle() {
@@ -36,28 +40,20 @@ public class Task {
         this.title = title;
     }
 
+    public Date getTask_date() {
+        return task_date;
+    }
+
+    public void setTask_date(Date task_date) {
+        this.task_date = task_date;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Boolean getIsDone() {
-        return isDone;
-    }
-
-    public void setIsDone(Boolean isDone) {
-        this.isDone = isDone;
     }
 
     public String getPriority() {
@@ -67,4 +63,29 @@ public class Task {
     public void setPriority(String priority) {
         this.priority = priority;
     }
+
+    public Boolean getIs_done() {
+        return is_done;
+    }
+
+    public void setIs_done(Boolean is_done) {
+        this.is_done = is_done;
+    }
+
+    public Date getDate_created() {
+        return date_created;
+    }
+
+    public void setDate_created(Date date_created) {
+        this.date_created = date_created;
+    }
+
+    public Date getDate_done() {
+        return date_done;
+    }
+
+    public void setDate_done(Date date_done) {
+        this.date_done = date_done;
+    }
 }
+

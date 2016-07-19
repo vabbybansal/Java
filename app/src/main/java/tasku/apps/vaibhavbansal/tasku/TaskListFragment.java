@@ -1,6 +1,5 @@
 package tasku.apps.vaibhavbansal.tasku;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,12 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,6 +24,8 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        //Will have a menu and will recieve Menu Call Backs
+//        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -50,15 +46,17 @@ public class TaskListFragment extends Fragment {
     private void connectRecyclerViewAndAdapter(){
 //        if(taskAdapter == null){
 
-                List<Task> dummyTasks = new ArrayList<>();
+                //get Tasks from DB using TaskLab helper class
+                TaskLab taskLab = TaskLab.get(getActivity());
+                List<Task> allTasks = taskLab.getTasksFromDB();
 
-                for(int i=0;i<10;i++){
-                    Task task = new Task("Task - " + i, "Karle bhai nhi toh khatam hai bey tuu", new Date(),true, "Very High" );
-                    dummyTasks.add(task);
+//                for(int i=0;i<10;i++){
+//                    Task task = new Task("Task - " + i, "Karle bhai nhi toh khatam hai bey tuu", new Date(),true, "Very High" );
+//                    dummyTasks.add(task);
+//
+//                }
 
-                }
-
-                taskAdapter = new TaskAdapter(dummyTasks);
+                taskAdapter = new TaskAdapter(allTasks);
                 recyclerView.setAdapter(taskAdapter);
 //        }
 //        else{
@@ -70,8 +68,9 @@ public class TaskListFragment extends Fragment {
     private class TaskHolder extends RecyclerView.ViewHolder{
 
         private TextView title;
-        private TextView date;
+
         private TextView description;
+        private TextView task_date;
         private TextView priority;
 
         private TaskHolder(View itemView) {
@@ -79,14 +78,14 @@ public class TaskListFragment extends Fragment {
 
             //Assign TaskHolder member mimic variables to the actual Elements on the View of the List
             title = (TextView)itemView.findViewById(R.id.id_task_title);
-            date = (TextView)itemView.findViewById(R.id.id_task_date);
+            task_date = (TextView)itemView.findViewById(R.id.id_task_date);
             description = (TextView)itemView.findViewById(R.id.id_task_description);
             priority = (TextView)itemView.findViewById(R.id.id_task_priority);
         }
             //Bind the actual data to the view object
         public void bindMyTask(Task task){
             title.setText(task.getTitle());
-            date.setText(task.getDate().toString());
+            task_date.setText(task.getTask_date().toString());
             description.setText(task.getDescription());
             priority.setText(task.getPriority());
         }
