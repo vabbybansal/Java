@@ -48,20 +48,31 @@ public class TaskListFragment extends Fragment {
     }
 
     private void connectRecyclerViewAndAdapter(){
-//        if(taskAdapter == null){
 
-                //get Tasks from DB using TaskLab helper class
-                TaskLab taskLab = TaskLab.get(getActivity());
-                List<Task> allTasks = taskLab.getTasksFromDB();
+        //get Tasks from DB using TaskLab helper class
+        TaskLab taskLab = TaskLab.get(getActivity());
+        List<Task> allTasks = taskLab.getTasksFromDB();
+
+        if(taskAdapter == null){
+
 
                 taskAdapter = new TaskAdapter(allTasks);
                 recyclerView.setAdapter(taskAdapter);
-//        }
-//        else{
-//            taskAdapter.setMyTasks(allTasks);
-//            taskAdapter.notifyDataSetChanged();
-//        }
+        }
+        else{
+            //recheck the data from DB in case an activity was created / destroyed. Make the same representation in the List View
+            taskAdapter.setMyTasks(allTasks);
+            taskAdapter.notifyDataSetChanged();
+        }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Update data to adapter when the activity is resumed from some other activity
+        connectRecyclerViewAndAdapter();
+    }
+
     //View Holder of the RecyclerView
     private class TaskHolder extends RecyclerView.ViewHolder{
 
@@ -141,7 +152,7 @@ public class TaskListFragment extends Fragment {
                 //Task newTask = new Task();
                 //TaskLab.get(getActivity()).addTask(newTask);
                 //Start a plain Detail Activity for creating a new Task
-                Intent intent = TaskDetailActivity.newIntentNoArgs(getActivity());
+                Intent intent = TaskDetailActivity.newIntent(getActivity(),"Create New Task", null);
                 startActivity(intent);
                 return true;
 
