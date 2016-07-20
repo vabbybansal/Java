@@ -3,7 +3,12 @@ package tasku.apps.vaibhavbansal.tasku;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,6 +32,10 @@ public class TaskDetailFragment extends Fragment{
     private EditText titleEditText;
     private EditText descriptionEditText;
     private Spinner prioritySpinner;
+    //logic variables
+    private UUID taskId;
+    private Boolean isEditFrag = false;
+
 
     public static TaskDetailFragment newInstance(String whatToDoWithIntent, UUID taskId){
         //taskId is null in case of whatToDo = "Create new Task"
@@ -40,10 +49,17 @@ public class TaskDetailFragment extends Fragment{
 
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+
 
         View view = inflater.inflate(R.layout.fragment_detailed_view, container, false);
         titleEditText = (EditText) view.findViewById(R.id.id_detail_view_task_title);
@@ -52,7 +68,7 @@ public class TaskDetailFragment extends Fragment{
 
 
         String whatToDoWithIntent = (String) getArguments().getSerializable(ARG_WHAT_TO_DO_WITH_INTENT);
-        UUID taskId = (UUID) getArguments().getSerializable(ARG_TASK_ID);
+        taskId = (UUID) getArguments().getSerializable(ARG_TASK_ID);
 
         handleWhatToDoWithIntent(view, whatToDoWithIntent, taskId);
 
@@ -61,8 +77,11 @@ public class TaskDetailFragment extends Fragment{
 
     }
     private void handleWhatToDoWithIntent(View view, String whatToDoWithIntent, final UUID taskId){
+
+        String toolbarTitle = new String();
         //if it's an add new task, set visible the Create New Task Button
         if(whatToDoWithIntent.equals(getString(R.string.app_constant_create_new_task))){
+            toolbarTitle = getString(R.string.title_create_a_new_task);
             createTaskButton = (Button) view.findViewById(R.id.id_detail_view_create_task_button);
             createTaskButton.setVisibility(View.VISIBLE);
             createTaskButton.setOnClickListener(new View.OnClickListener(){
@@ -73,16 +92,7 @@ public class TaskDetailFragment extends Fragment{
                     newTask.setDescription(descriptionEditText.getText().toString());
                     newTask.setPriority(prioritySpinner.getSelectedItem().toString());
                     newTask.setIs_done(false);
-
-//                    newTask.setIs_done(true);
-//                    newTask.setPriority("High Priority");
-//                    newTask.setTitle("Get Milk");
-//                    newTask.setDescription("Nothing");
-//                    newTask.setDate_done(new Date());
-//                    newTask.setDate_created(new Date());
-                    //newTask.setTask_date(new Date());
-
-
+                    newTask.setDate_created(new Date());
                     TaskLab.get(getActivity()).addTask(newTask);
                     getActivity().finish();
                 }
@@ -90,7 +100,69 @@ public class TaskDetailFragment extends Fragment{
 
 
         }
+        //if it is an edit task
+        else if (whatToDoWithIntent.equals(getString(R.string.app_constant_show_existing_task))){
+            toolbarTitle = " " + getString(R.string.title_edit_task);
+            isEditFrag = true;
+            Task selectedTask = TaskLab.get(getActivity()).getTask(taskId);
+            populateFields(selectedTask);
+        }
 
+
+        //Update ToolBar Title accordingly.
+        handleAppCompatToolbar(toolbarTitle);
+
+    }
+
+    private void handleAppCompatToolbar(String toolbarTitle){
+        // (Need to cast the activity as AppCompatActivity to get the function getSupportActionBar)
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(toolbarTitle);
+        //set icon in case of edit
+        if(isEditFrag){
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayUseLogoEnabled(true);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setLogo(R.drawable.ic_edit_icon);
+        }
+
+    }
+
+    private void populateFields(Task selectedTask) {
+        titleEditText.setText(selectedTask.getTitle().toString());
+        descriptionEditText.setText(selectedTask.getDescription().toString());
+        prioritySpinner.setSelection(getSpinnerIndex(prioritySpinner, selectedTask.getPriority()));
+    }
+    private int getSpinnerIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if(isEditFrag){
+            inflater.inflate(R.menu.fragment_task_detail, menu);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+
+            case(R.id.id_menu_item_delete):
+                TaskLab.get(getActivity()).deleteTask(taskId);
+                getActivity().finish();
+                return true;
+            default:return super.onOptionsItemSelected(item);
+        }
 
 
     }

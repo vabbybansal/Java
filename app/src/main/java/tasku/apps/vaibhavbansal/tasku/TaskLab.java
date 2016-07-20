@@ -110,6 +110,15 @@ public class TaskLab {
         sqLiteDatabase.update(TaskDBSchema.AllTasksTable.NAME, contentValues, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString});
     }
 
+    //delete a previous task
+    public void deleteTask(UUID taskId){
+        String uuidString = taskId.toString();
+        this.deleteTask(uuidString);
+    }
+    public void deleteTask(String uuidString){
+        sqLiteDatabase.delete(TaskDBSchema.AllTasksTable.NAME, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString});
+    }
+
     public List<Task> getTasksFromDB(){
         List<Task> tasks = new ArrayList<>();
         TaskCursorWrapper cursor = queryTasks(null, null);
