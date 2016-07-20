@@ -96,27 +96,27 @@ public class TaskLab {
         }
     }
     //write tasks by first preparing the contentValues
-    public void addTask(Task task){
+    public long addTask(Task task){
         ContentValues contentValues = getContentValues(task);
-        sqLiteDatabase.insert(TaskDBSchema.AllTasksTable.NAME, null, contentValues);
+        return(sqLiteDatabase.insert(TaskDBSchema.AllTasksTable.NAME, null, contentValues));
     }
 
     //update a previous task
-    public void updateTask(Task task){
+    public int updateTask(Task task){
         String uuidString = task.getUuid().toString();
         //create contentvalues for write
         ContentValues contentValues = getContentValues(task);
         //Update
-        sqLiteDatabase.update(TaskDBSchema.AllTasksTable.NAME, contentValues, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString});
+        return(sqLiteDatabase.update(TaskDBSchema.AllTasksTable.NAME, contentValues, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString}));
     }
 
     //delete a previous task
-    public void deleteTask(UUID taskId){
+    public int deleteTask(UUID taskId){
         String uuidString = taskId.toString();
-        this.deleteTask(uuidString);
+        return this.deleteTask(uuidString);
     }
-    public void deleteTask(String uuidString){
-        sqLiteDatabase.delete(TaskDBSchema.AllTasksTable.NAME, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString});
+    public int deleteTask(String uuidString){
+        return(sqLiteDatabase.delete(TaskDBSchema.AllTasksTable.NAME, TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuidString}));
     }
 
     public List<Task> getTasksFromDB(){

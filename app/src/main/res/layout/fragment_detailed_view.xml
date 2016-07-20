@@ -16,12 +16,6 @@
         android:layout_marginBottom="10dp"
 
         android:textColor="#ff666666" />
-    <!--<ImageView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:icon="@drawable/ic_edit_icon"-->
-        <!--android:title="Edit Task Details"/>-->
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -86,7 +80,15 @@
             android:visibility="gone"
             android:layout_marginTop="10dp"/>
 
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/id_detail_view_update_task_button"
+        android:text="Update This Task"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        />
+    <!--android:enabled="false"-->
 
 
 </LinearLayout>

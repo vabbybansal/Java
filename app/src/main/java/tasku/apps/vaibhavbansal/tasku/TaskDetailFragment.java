@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class TaskDetailFragment extends Fragment{
 
     //View Variables
     private Button createTaskButton;
+    private Button updateTaskButton;
     private EditText titleEditText;
     private EditText descriptionEditText;
     private Spinner prioritySpinner;
@@ -76,6 +78,18 @@ public class TaskDetailFragment extends Fragment{
 
 
     }
+    private Task setViewInputsIntoTask(Boolean isThisNewTask, Task taskToBeSet){
+
+        taskToBeSet.setTitle(titleEditText.getText().toString());
+        taskToBeSet.setDescription(descriptionEditText.getText().toString());
+        taskToBeSet.setPriority(prioritySpinner.getSelectedItem().toString());
+
+        if(isThisNewTask){
+            taskToBeSet.setDate_created(new Date());
+            taskToBeSet.setIs_done(false);
+        }
+        return taskToBeSet;
+    }
     private void handleWhatToDoWithIntent(View view, String whatToDoWithIntent, final UUID taskId){
 
         String toolbarTitle = new String();
@@ -87,13 +101,14 @@ public class TaskDetailFragment extends Fragment{
             createTaskButton.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
-                    Task newTask = new Task();
-                    newTask.setTitle(titleEditText.getText().toString());
-                    newTask.setDescription(descriptionEditText.getText().toString());
-                    newTask.setPriority(prioritySpinner.getSelectedItem().toString());
-                    newTask.setIs_done(false);
-                    newTask.setDate_created(new Date());
-                    TaskLab.get(getActivity()).addTask(newTask);
+                    Task newTask = setViewInputsIntoTask(true, new Task());
+                    long insertStatus = TaskLab.get(getActivity()).addTask(newTask);
+                    if(insertStatus != -1){
+                        toastAway(true);
+                    }
+                    else{
+                        toastAway(false);
+                    }
                     getActivity().finish();
                 }
             });
@@ -106,6 +121,8 @@ public class TaskDetailFragment extends Fragment{
             isEditFrag = true;
             Task selectedTask = TaskLab.get(getActivity()).getTask(taskId);
             populateFields(selectedTask);
+            //Put Update Button
+            handleUpdateButtonIsTrue(view);
         }
 
 
@@ -114,6 +131,32 @@ public class TaskDetailFragment extends Fragment{
 
     }
 
+    private void handleUpdateButtonIsTrue(View view) {
+        updateTaskButton = (Button) view.findViewById(R.id.id_detail_view_update_task_button);
+        updateTaskButton.setVisibility(View.VISIBLE);
+        updateTaskButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Task taskToBeUpdated = TaskLab.get(getActivity()).getTask(taskId);
+                int updateStatus = TaskLab.get(getActivity()).updateTask(setViewInputsIntoTask(false, taskToBeUpdated));
+                if(updateStatus > 0){
+                    toastAway(true);
+                }
+                else{
+                    toastAway(false);
+                }
+                getActivity().finish();
+            }
+        });
+    }
+    private void toastAway(boolean isSuccess){
+        if(isSuccess){
+            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+        }
+    }
     private void handleAppCompatToolbar(String toolbarTitle){
         // (Need to cast the activity as AppCompatActivity to get the function getSupportActionBar)
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(toolbarTitle);
@@ -158,7 +201,13 @@ public class TaskDetailFragment extends Fragment{
         switch(item.getItemId()){
 
             case(R.id.id_menu_item_delete):
-                TaskLab.get(getActivity()).deleteTask(taskId);
+                int deleteStatus = TaskLab.get(getActivity()).deleteTask(taskId);
+                if(deleteStatus != 0){
+                    toastAway(true);
+                }
+                else{
+                    toastAway(false);
+                }
                 getActivity().finish();
                 return true;
             default:return super.onOptionsItemSelected(item);
