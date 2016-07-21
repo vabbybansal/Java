@@ -54,10 +54,11 @@ public class TaskDetailFragment extends Fragment{
     private Spinner prioritySpinner;
     private TextView taskDateTextView;
     private TextView timePickerTextView;
+
     //logic variables
     private UUID taskId;
     private Boolean isEditFrag = false;
-    private Date taskDate;
+    private Date taskDate = CommonLibrary.getZeroDate();
     private int taskHour;
     private int taskMinute;
     private String whatIntentWants;
@@ -95,7 +96,7 @@ public class TaskDetailFragment extends Fragment{
         taskDateTextView = (TextView) view.findViewById(R.id.id_detail_view_task_date);
         timePickerTextView = (TextView) view.findViewById(R.id.id_detail_view_task_time);
         //
-        updateTaskDate(new Date(0));
+//        updateTaskDate(new Date(0));
         if(savedInstanceState != null){
             myRestoreInstanceState(savedInstanceState);
             isRotated = 1;
@@ -219,6 +220,7 @@ public class TaskDetailFragment extends Fragment{
         prioritySpinner.setSelection(getSpinnerIndex(prioritySpinner, selectedTask.getPriority()));
         taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), selectedTask.getTask_date()));
         taskDate = selectedTask.getTask_date();
+        timePickerTextView.setText(CommonLibrary.handleModelToViewTime(getActivity(), taskDate));
 //        handleToViewDate()
     }
 //    public String handleToViewDate(String date){
@@ -317,13 +319,21 @@ public class TaskDetailFragment extends Fragment{
 //        super.onActivityResult(requestCode, resultCode, data);
     }
     public void putTimeInDate(int hour, int minute){
+        //if Date is not set till now and I do set a time, then set task date to today's date
+        if(taskDate.before(CommonLibrary.getConstantDateToCompare())){
+            taskDate = new Date();
+        }
         Calendar c = CommonLibrary.setCalendarFromMilliSec(taskDate.getTime());
         c.set(Calendar.HOUR_OF_DAY, hour);
         c.set(Calendar.MINUTE, minute);
-        updateTaskDate(CommonLibrary.calendarToDate(c));
+//        updateTaskDate(CommonLibrary.calendarToDate(c));
+        taskDate = CommonLibrary.calendarToDate(c);
+        timePickerTextView.setText(CommonLibrary.handleModelToViewTime(getActivity(), taskDate));
+        taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), taskDate));
     }
     public void updateTaskDate(Date date){
-        taskDate = date;
+        //(oldDate, newDate)
+        taskDate = CommonLibrary.updateOnlyDatePart(taskDate, date);
         taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), date));
     }
 
@@ -348,6 +358,7 @@ public class TaskDetailFragment extends Fragment{
         prioritySpinner.setSelection(getSpinnerIndex(prioritySpinner, savedState.getString(SAVED_PRIORITY)));
         long savedDate = savedState.getLong(SAVED_TASK_DATE);
         updateTaskDate(new Date(savedDate));
+        timePickerTextView.setText(CommonLibrary.handleModelToViewTime(getActivity(), taskDate));
     }
 
 }
