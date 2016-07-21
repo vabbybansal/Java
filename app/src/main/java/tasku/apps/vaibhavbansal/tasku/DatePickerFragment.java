@@ -44,7 +44,9 @@ public class DatePickerFragment extends DialogFragment {
         if(date.equals(new Date(0))){
             date = new Date();
         }
-
+//        /////////////
+//        date = new Date(new Date().getTime() - (7 *  1000 * 60 * 60 * 24));
+//        /////////////
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
@@ -56,6 +58,7 @@ public class DatePickerFragment extends DialogFragment {
 
         datepicker = (DatePicker) v.findViewById(R.id.dialog_date_date_picker);
         datepicker.init(year, month, day, null);
+        datepicker.setMinDate(System.currentTimeMillis() - 1000);
 
 
 //        return super.onCreateDialog(savedInstanceState);

@@ -35,6 +35,16 @@ public class TaskDetailFragment extends Fragment{
     //constant for the TaskDetailFragment to identify that the date passed back is from the DatePickerFragment
     private static final int REQUEST_DATE  = 0;
 
+    //dummy dumm
+    private static final String DIALOG_TIME = "DialogTime";
+    private static final int REQUEST_TIME = 0;
+
+    //Onscreen Rotation save instance state final strings
+    private static final String SAVED_TITLE = "saved_title";
+    private static final String SAVED_DESCRIPTION = "saved_description";
+    private static final String SAVED_TASK_DATE = "saved_task_date";
+    private static final String SAVED_PRIORITY = "saved_priority";
+
     //View Variables
     private Button createTaskButton;
     private Button updateTaskButton;
@@ -42,10 +52,13 @@ public class TaskDetailFragment extends Fragment{
     private EditText descriptionEditText;
     private Spinner prioritySpinner;
     private TextView taskDateTextView;
+    private TextView timePickerTextView;
     //logic variables
     private UUID taskId;
     private Boolean isEditFrag = false;
     private Date taskDate;
+    private String whatIntentWants;
+    private int isRotated;
 
 
     public static TaskDetailFragment newInstance(String whatToDoWithIntent, UUID taskId){
@@ -77,9 +90,19 @@ public class TaskDetailFragment extends Fragment{
         descriptionEditText = (EditText) view.findViewById(R.id.id_detail_view_task_description);
         prioritySpinner = (Spinner) view.findViewById(R.id.id_detail_view_priority_spinner);
         taskDateTextView = (TextView) view.findViewById(R.id.id_detail_view_task_date);
+        timePickerTextView = (TextView) view.findViewById(R.id.id_detail_view_task_time);
+        //
+        updateTaskDate(new Date(0));
+        if(savedInstanceState != null){
+            myRestoreInstanceState(savedInstanceState);
+            isRotated = 1;
+        }
 
         String whatToDoWithIntent = (String) getArguments().getSerializable(ARG_WHAT_TO_DO_WITH_INTENT);
+        whatIntentWants = whatToDoWithIntent;
         taskId = (UUID) getArguments().getSerializable(ARG_TASK_ID);
+
+
 
         handleWhatToDoWithIntent(view, whatToDoWithIntent, taskId);
 
@@ -109,7 +132,7 @@ public class TaskDetailFragment extends Fragment{
         if(whatToDoWithIntent.equals(getString(R.string.app_constant_create_new_task))){
             toolbarTitle = getString(R.string.title_create_a_new_task);
             //set initial temp date as null / Date(0) until changes by the user
-            updateTaskDate(new Date(0));
+
 
             createTaskButton = (Button) view.findViewById(R.id.id_detail_view_create_task_button);
             createTaskButton.setVisibility(View.VISIBLE);
@@ -135,7 +158,10 @@ public class TaskDetailFragment extends Fragment{
             toolbarTitle = " " + getString(R.string.title_edit_task);
             isEditFrag = true;
             Task selectedTask = TaskLab.get(getActivity()).getTask(taskId);
-            populateFields(selectedTask);
+            if(isRotated != 1){
+                populateFields(selectedTask);
+            }
+
             //Put Update Button
             handleUpdateButtonIsTrue(view);
         }
@@ -255,6 +281,20 @@ public class TaskDetailFragment extends Fragment{
                 datePickerDialog.show(fm, DIALOG_DATE);
             }
         });
+
+        //
+        timePickerTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getFragmentManager();
+                TimePickerFragment timePickerDialog = TimePickerFragment.newInstance();
+
+                timePickerDialog.setTargetFragment(TaskDetailFragment.this, REQUEST_TIME);
+                timePickerDialog.show(fm, DIALOG_TIME);
+            }
+        });
+
+
     }
 
     @Override
@@ -272,4 +312,28 @@ public class TaskDetailFragment extends Fragment{
         taskDate = date;
         taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), date));
     }
+
+    //save data on screen rotation
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+
+            outState.putString(SAVED_TITLE, titleEditText.getText().toString());
+            outState.putString(SAVED_DESCRIPTION, descriptionEditText.getText().toString());
+            outState.putString(SAVED_PRIORITY, prioritySpinner.getSelectedItem().toString());
+            outState.putLong(SAVED_TASK_DATE, taskDate.getTime());
+
+    }
+
+    public void myRestoreInstanceState(Bundle savedState){
+
+        titleEditText.setText(savedState.getString(SAVED_TITLE));
+        descriptionEditText.setText(savedState.getString(SAVED_DESCRIPTION));
+        prioritySpinner.setSelection(getSpinnerIndex(prioritySpinner, savedState.getString(SAVED_PRIORITY)));
+        long savedDate = savedState.getLong(SAVED_TASK_DATE);
+        updateTaskDate(new Date(savedDate));
+    }
+
 }
