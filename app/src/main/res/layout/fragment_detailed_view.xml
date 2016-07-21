@@ -149,7 +149,14 @@
         android:layout_marginTop="10dp"
         />
     <!--android:enabled="false"-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/id_detail_view_complete_task"
+        android:text="Task Completed"
+        android:layout_marginTop="30dp"
 
-
+        />
+    <!--android:visibility="gone"-->
 
 </LinearLayout>

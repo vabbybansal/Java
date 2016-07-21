@@ -12,7 +12,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -82,6 +84,7 @@ public class TaskListFragment extends Fragment {
         private TextView task_date;
         private TextView priority;
         private TextView task_time;
+        private CheckBox isDone;
 
         private TaskHolder(View itemView) {
             super(itemView);
@@ -95,23 +98,36 @@ public class TaskListFragment extends Fragment {
             description = (TextView)itemView.findViewById(R.id.id_task_description);
             priority = (TextView)itemView.findViewById(R.id.id_task_priority);
             task_time = (TextView) itemView.findViewById(R.id.id_task_time);
+            isDone = (CheckBox) itemView.findViewById(R.id.id_list_item_checkBox);
+
+            //set on click on checkbox too
+            isDone.setOnClickListener(this);
         }
             //Bind the actual data to the view object
         public void bindMyTask(Task task){
             bindedTask = task;
             title.setText(task.getTitle());
-            task_date.setText(CommonLibrary.handleModelToViewDate(getActivity(),task.getTask_date()));
+            task_date.setText(CommonLibrary.handleModelToViewDate(getActivity(), task.getTask_date()));
             task_time.setText(CommonLibrary.handleModelToViewTime(getActivity(), task.getTask_date()));
             description.setText(task.getDescription());
             priority.setText(task.getPriority());
+            isDone.setChecked(task.getIs_done());
         }
         //Onclick handler to the item in the list view
 
         @Override
         public void onClick(View view) {
-//            Toast.makeText(getActivity(), bindedTask.getTitle() , Toast.LENGTH_SHORT).show();
-            Intent intent = TaskDetailActivity.newIntent(getActivity(), getString(R.string.app_constant_show_existing_task) ,bindedTask.getUuid());
-            startActivity(intent);
+//            Toast.makeText(getActivity(), bindedTask.getTitle(), Toast.LENGTH_SHORT).show();
+
+            if(view.getId() == isDone.getId()){
+                CheckBox v = (CheckBox) view;
+                bindedTask.setIs_done(v.isChecked());
+                TaskLab.get(getActivity()).updateTask(bindedTask);
+            }
+            else{
+                Intent intent = TaskDetailActivity.newIntent(getActivity(), getString(R.string.app_constant_show_existing_task) ,bindedTask.getUuid());
+                startActivity(intent);
+            }
         }
     }
     //Adapter of the RecyclerView
@@ -129,6 +145,7 @@ public class TaskListFragment extends Fragment {
             //inflate list item and create the corresponding TaskHolder
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
             View view = layoutInflater.inflate(R.layout.item_task_list, viewGroup, false);
+
             return new TaskHolder(view);
         }
 
@@ -149,6 +166,7 @@ public class TaskListFragment extends Fragment {
         public void setMyTasks(List<Task> allTasks){
             this.allTasks = allTasks;
         }
+
     }
 
 

@@ -3,6 +3,7 @@ package tasku.apps.vaibhavbansal.tasku;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,6 +50,7 @@ public class TaskDetailFragment extends Fragment{
     //View Variables
     private Button createTaskButton;
     private Button updateTaskButton;
+    private Button completeButton;
     private EditText titleEditText;
     private EditText descriptionEditText;
     private Spinner prioritySpinner;
@@ -168,6 +170,7 @@ public class TaskDetailFragment extends Fragment{
 
             //Put Update Button
             handleUpdateButtonIsTrue(view);
+            handleCompleteButtonIsTrue(view);
         }
 
 
@@ -191,6 +194,27 @@ public class TaskDetailFragment extends Fragment{
                     toastAway(false);
                 }
                 getActivity().finish();
+            }
+        });
+    }
+    private void handleCompleteButtonIsTrue(View view){
+        completeButton = (Button) view.findViewById(R.id.id_detail_view_complete_task);
+        completeButton.setVisibility(View.VISIBLE);
+        completeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Task taskToBeCompleted = TaskLab.get(getActivity()).getTask(taskId);
+                taskToBeCompleted.setIs_done(true);
+                TaskLab.get(getActivity()).updateTask(taskToBeCompleted);
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_SHORT).show();
+                        getActivity().finish();
+                    }
+                }, 400);
             }
         });
     }

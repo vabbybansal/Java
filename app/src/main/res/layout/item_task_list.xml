@@ -4,35 +4,68 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/id_task_title"
-        android:layout_alignParentLeft="true"
-        tools:text="Email Sophia"
-        android:padding="4dp"/>
+        android:id="@+id/id_list_item_head"
+        android:orientation="horizontal">
 
-    <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_task_title"
+
+            tools:text="Email Sophia"
+            android:padding="4dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="4sp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_task_priority"
+            android:layout_alignParentRight="true"
+            tools:text="Priority:Very High"
+            android:padding="4dp"
+            android:layout_marginTop="4sp"
+            />
+        </RelativeLayout>
+
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/id_task_dateandtime"
-        android:layout_below="@id/id_task_title">
+        android:layout_below="@id/id_list_item_head">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/id_task_date"
-            android:layout_below="@id/id_task_title"
+            android:gravity="center_vertical"
             tools:text="10 August 2016"
-            android:padding="4dp"/>
+            android:padding="4dp"
+            android:layout_centerVertical="true"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="5:30 PM"
             android:layout_marginLeft="20dp"
-            android:id="@+id/id_task_time"/>
+            android:id="@+id/id_task_time"
+            android:layout_toRightOf="@id/id_task_date"
+            android:layout_centerVertical="true"/>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_list_item_checkBox"
+            android:padding="0dp"
+            android:gravity="right"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <!--<TextView-->
         <!--android:layout_width="wrap_content"-->
@@ -52,14 +85,7 @@
         tools:text="High Priority saale varna vo maar daalegi :("
         android:padding="4dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/id_task_priority"
-        android:layout_alignParentRight="true"
-        tools:text="Priority:Very High"
-        android:padding="4dp"
-        android:textColor="@android:color/holo_red_dark"/>
+
 
 
 
