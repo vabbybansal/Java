@@ -1,9 +1,11 @@
 package tasku.apps.vaibhavbansal.tasku;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -27,6 +30,10 @@ public class TaskDetailFragment extends Fragment{
     private static final String ARG_TASK_ID = "task_id";
     private static final String ARG_WHAT_TO_DO_WITH_INTENT = "what_to_do_with_intent";
 
+    //this is a tag for the DatePickerFragment(Dialog Fragment) and helps in its identification by the hosting activity
+    private static final String DIALOG_DATE = "DialogDate";
+    //constant for the TaskDetailFragment to identify that the date passed back is from the DatePickerFragment
+    private static final int REQUEST_DATE  = 0;
 
     //View Variables
     private Button createTaskButton;
@@ -34,9 +41,11 @@ public class TaskDetailFragment extends Fragment{
     private EditText titleEditText;
     private EditText descriptionEditText;
     private Spinner prioritySpinner;
+    private TextView taskDateTextView;
     //logic variables
     private UUID taskId;
     private Boolean isEditFrag = false;
+    private Date taskDate;
 
 
     public static TaskDetailFragment newInstance(String whatToDoWithIntent, UUID taskId){
@@ -67,12 +76,15 @@ public class TaskDetailFragment extends Fragment{
         titleEditText = (EditText) view.findViewById(R.id.id_detail_view_task_title);
         descriptionEditText = (EditText) view.findViewById(R.id.id_detail_view_task_description);
         prioritySpinner = (Spinner) view.findViewById(R.id.id_detail_view_priority_spinner);
-
+        taskDateTextView = (TextView) view.findViewById(R.id.id_detail_view_task_date);
 
         String whatToDoWithIntent = (String) getArguments().getSerializable(ARG_WHAT_TO_DO_WITH_INTENT);
         taskId = (UUID) getArguments().getSerializable(ARG_TASK_ID);
 
         handleWhatToDoWithIntent(view, whatToDoWithIntent, taskId);
+
+        //create onClicks
+        createViewOnclicks(view);
 
         return view;
 
@@ -83,7 +95,7 @@ public class TaskDetailFragment extends Fragment{
         taskToBeSet.setTitle(titleEditText.getText().toString());
         taskToBeSet.setDescription(descriptionEditText.getText().toString());
         taskToBeSet.setPriority(prioritySpinner.getSelectedItem().toString());
-
+        taskToBeSet.setTask_date(taskDate);
         if(isThisNewTask){
             taskToBeSet.setDate_created(new Date());
             taskToBeSet.setIs_done(false);
@@ -96,6 +108,9 @@ public class TaskDetailFragment extends Fragment{
         //if it's an add new task, set visible the Create New Task Button
         if(whatToDoWithIntent.equals(getString(R.string.app_constant_create_new_task))){
             toolbarTitle = getString(R.string.title_create_a_new_task);
+            //set initial temp date as null / Date(0) until changes by the user
+            updateTaskDate(new Date(0));
+
             createTaskButton = (Button) view.findViewById(R.id.id_detail_view_create_task_button);
             createTaskButton.setVisibility(View.VISIBLE);
             createTaskButton.setOnClickListener(new View.OnClickListener(){
@@ -173,7 +188,18 @@ public class TaskDetailFragment extends Fragment{
         titleEditText.setText(selectedTask.getTitle().toString());
         descriptionEditText.setText(selectedTask.getDescription().toString());
         prioritySpinner.setSelection(getSpinnerIndex(prioritySpinner, selectedTask.getPriority()));
+        taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), selectedTask.getTask_date()));
+        taskDate = selectedTask.getTask_date();
+//        handleToViewDate()
     }
+//    public String handleToViewDate(String date){
+//        if(date.equals(new Date(0).toString())){
+//            return "Date Not Specified";
+//        }
+//        else{
+//            return date;
+//        }
+//    }
     private int getSpinnerIndex(Spinner spinner, String myString)
     {
         int index = 0;
@@ -214,5 +240,36 @@ public class TaskDetailFragment extends Fragment{
         }
 
 
+    }
+    public void createViewOnclicks(View view){
+
+        //Onclick on the Task Date Button
+        taskDateTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getFragmentManager();
+                DatePickerFragment datePickerDialog = DatePickerFragment.newInstance(taskDate);
+
+                //set the current fragment as the target fragment so that message is recieved by this fragment when datepicker fragment closes
+                datePickerDialog.setTargetFragment(TaskDetailFragment.this, REQUEST_DATE);
+                datePickerDialog.show(fm, DIALOG_DATE);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if(resultCode != Activity.RESULT_OK){
+          return;
+        }
+        if(requestCode == REQUEST_DATE){
+            Date date = (Date) intent.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            updateTaskDate(date);
+        }
+//        super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void updateTaskDate(Date date){
+        taskDate = date;
+        taskDateTextView.setText(CommonLibrary.handleModelToViewDate(getActivity(), date));
     }
 }

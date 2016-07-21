@@ -98,7 +98,7 @@ public class TaskListFragment extends Fragment {
         public void bindMyTask(Task task){
             bindedTask = task;
             title.setText(task.getTitle());
-            task_date.setText(task.getTask_date().toString());
+            task_date.setText(CommonLibrary.handleModelToViewDate(getActivity(),task.getTask_date()));
             description.setText(task.getDescription());
             priority.setText(task.getPriority());
         }

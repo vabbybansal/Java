@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,11 +73,11 @@ public class TaskLab {
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.UUID, task.getUuid().toString());
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.TITLE, task.getTitle());
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.DESCRIPTION, task.getDescription());
-        contentValues.put(TaskDBSchema.AllTasksTable.Cols.TASK_DATE, handleNullDates(task.getTask_date()));
+        contentValues.put(TaskDBSchema.AllTasksTable.Cols.TASK_DATE, CommonLibrary.handleDateToMilliseconds(task.getTask_date()));
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.PRIORITY, task.getPriority());
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.IS_DONE, task.getIs_done() ? 1 : 0);
-        contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_CREATED, handleNullDates(task.getDate_created()));
-        contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_DONE, handleNullDates(task.getDate_done()));
+        contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_CREATED, CommonLibrary.handleDateToMilliseconds(task.getDate_created()));
+        contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_DONE, CommonLibrary.handleDateToMilliseconds(task.getDate_done()));
 
 
 
@@ -86,15 +85,7 @@ public class TaskLab {
         return contentValues;
 
     }
-    private static Long handleNullDates(Date date){
-        if(date == null)
-        {
-            return null;
-        }
-        else{
-            return date.getTime();
-        }
-    }
+
     //write tasks by first preparing the contentValues
     public long addTask(Task task){
         ContentValues contentValues = getContentValues(task);

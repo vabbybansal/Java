@@ -16,5 +16,7 @@
     <string name="create_task">Create Task</string>
     <string name="title_create_a_new_task">Create a New Task</string>
     <string name="title_edit_task">Edit Task</string>
+    <string name="label_date_not_specified">Date Not Specified</string>
+    <string name="choose_task_date">Choose the task Date</string>
 
 </resources>
