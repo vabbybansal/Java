@@ -81,6 +81,7 @@ public class TaskListFragment extends Fragment {
         private TextView description;
         private TextView task_date;
         private TextView priority;
+        private TextView task_time;
 
         private TaskHolder(View itemView) {
             super(itemView);
@@ -93,12 +94,14 @@ public class TaskListFragment extends Fragment {
             task_date = (TextView)itemView.findViewById(R.id.id_task_date);
             description = (TextView)itemView.findViewById(R.id.id_task_description);
             priority = (TextView)itemView.findViewById(R.id.id_task_priority);
+            task_time = (TextView) itemView.findViewById(R.id.id_task_time);
         }
             //Bind the actual data to the view object
         public void bindMyTask(Task task){
             bindedTask = task;
             title.setText(task.getTitle());
             task_date.setText(CommonLibrary.handleModelToViewDate(getActivity(),task.getTask_date()));
+            task_time.setText(CommonLibrary.handleModelToViewTime(getActivity(), task.getTask_date()));
             description.setText(task.getDescription());
             priority.setText(task.getPriority());
         }

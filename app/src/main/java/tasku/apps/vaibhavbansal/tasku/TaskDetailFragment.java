@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class TaskDetailFragment extends Fragment{
 
     //dummy dumm
     private static final String DIALOG_TIME = "DialogTime";
-    private static final int REQUEST_TIME = 0;
+    private static final int REQUEST_TIME = 1;
 
     //Onscreen Rotation save instance state final strings
     private static final String SAVED_TITLE = "saved_title";
@@ -57,6 +58,8 @@ public class TaskDetailFragment extends Fragment{
     private UUID taskId;
     private Boolean isEditFrag = false;
     private Date taskDate;
+    private int taskHour;
+    private int taskMinute;
     private String whatIntentWants;
     private int isRotated;
 
@@ -287,7 +290,7 @@ public class TaskDetailFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 FragmentManager fm = getFragmentManager();
-                TimePickerFragment timePickerDialog = TimePickerFragment.newInstance();
+                TimePickerFragment timePickerDialog = TimePickerFragment.newInstance(taskDate);
 
                 timePickerDialog.setTargetFragment(TaskDetailFragment.this, REQUEST_TIME);
                 timePickerDialog.show(fm, DIALOG_TIME);
@@ -306,7 +309,18 @@ public class TaskDetailFragment extends Fragment{
             Date date = (Date) intent.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             updateTaskDate(date);
         }
+        if(requestCode == REQUEST_TIME){
+            taskHour = (int) intent.getSerializableExtra(TimePickerFragment.EXTRA_HOUR);
+            taskMinute = (int) intent.getSerializableExtra(TimePickerFragment.EXTRA_MIN);
+            putTimeInDate(taskHour, taskMinute);
+        }
 //        super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void putTimeInDate(int hour, int minute){
+        Calendar c = CommonLibrary.setCalendarFromMilliSec(taskDate.getTime());
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        updateTaskDate(CommonLibrary.calendarToDate(c));
     }
     public void updateTaskDate(Date date){
         taskDate = date;

@@ -81,7 +81,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/id_detail_view_task_date"
                     android:textSize="16sp"
-
                     android:textColor="@android:color/black"
                     tools:text="Not Specified"
                     android:layout_marginTop="10dp"
@@ -102,7 +101,9 @@
                     android:layout_marginTop="50dp"
                     android:layout_marginLeft="100dp"
                     android:id="@+id/id_detail_view_task_time"
-                    android:text="Time Not Specified"/>
+                    android:text="Time Not Specified"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"/>
 
 
 

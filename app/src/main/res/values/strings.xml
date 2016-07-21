@@ -18,5 +18,6 @@
     <string name="title_edit_task">Edit Task</string>
     <string name="label_date_not_specified">Date Not Specified</string>
     <string name="choose_task_date">Choose the task Date</string>
+    <string name="time_not_set">Time Not Set</string>
 
 </resources>

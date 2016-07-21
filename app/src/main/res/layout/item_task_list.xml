@@ -12,13 +12,28 @@
         tools:text="Email Sophia"
         android:padding="4dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/id_task_date"
-        android:layout_below="@id/id_task_title"
-        tools:text="10 August 2016"
-        android:padding="4dp"/>
+        android:orientation="horizontal"
+        android:id="@+id/id_task_dateandtime"
+        android:layout_below="@id/id_task_title">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_task_date"
+            android:layout_below="@id/id_task_title"
+            tools:text="10 August 2016"
+            android:padding="4dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="5:30 PM"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/id_task_time"/>
+
+    </LinearLayout>
+
     <!--<TextView-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
@@ -33,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/id_task_description"
-        android:layout_below="@id/id_task_date"
+        android:layout_below="@id/id_task_dateandtime"
         tools:text="High Priority saale varna vo maar daalegi :("
         android:padding="4dp"/>
 

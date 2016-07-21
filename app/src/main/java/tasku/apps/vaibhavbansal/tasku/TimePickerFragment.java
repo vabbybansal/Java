@@ -1,7 +1,10 @@
 package tasku.apps.vaibhavbansal.tasku;
 
+import android.app.Activity;
 import android.app.Dialog;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -17,16 +20,17 @@ import java.util.Date;
  */
 public class TimePickerFragment extends DialogFragment {
 
+    public static final String EXTRA_HOUR = "hour";
+    public static final String EXTRA_MIN = "min";
+    private static final String ARG_DATE_FOR_TIME = "time";
     private TimePicker timePicker;
 
 
-    public static TimePickerFragment newInstance(){
-//        Bundle args = new Bundle();
-//        args.putSerializable(ARG_DATE, date);
-//        DatePickerFragment fragment = new DatePickerFragment();
-//        fragment.setArguments(args);
-//        return fragment;
+    public static TimePickerFragment newInstance(Date date){
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_DATE_FOR_TIME, date);
         TimePickerFragment fragment = new TimePickerFragment();
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -34,13 +38,12 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
-
-
-
-        Calendar c = Calendar.getInstance();
+        Date date = (Date)getArguments().getSerializable(ARG_DATE_FOR_TIME);
+        Calendar c = CommonLibrary.setCalendarFromMilliSec(date.getTime());
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
+
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
 
         timePicker = (TimePicker) v.findViewById(R.id.id_dialog_time_time_picker);
         timePicker.setCurrentHour(hour);
@@ -49,7 +52,24 @@ public class TimePickerFragment extends DialogFragment {
 
 
 
-        return new AlertDialog.Builder(getActivity()).setView(v).setTitle("Choose Time").setPositiveButton(android.R.string.ok, null).create();
+        return new AlertDialog.Builder(getActivity()).setView(v).setTitle("Choose Time").setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int hour = timePicker.getCurrentHour();
+                int minute = timePicker.getCurrentMinute();
+                sendResult(Activity.RESULT_OK, hour, minute);
+            }
+        }).create();
 
+    }
+
+    public void sendResult(int resultCode, int hour, int minute){
+        if(getTargetFragment() == null){
+            return;
+        }
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_HOUR, hour);
+        intent.putExtra(EXTRA_MIN, minute);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 }
