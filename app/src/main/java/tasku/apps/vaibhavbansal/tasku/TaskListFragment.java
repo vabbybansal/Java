@@ -1,9 +1,11 @@
 package tasku.apps.vaibhavbansal.tasku;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ public class TaskListFragment extends Fragment {
     //this view includes a list created using the recyclerview
     private RecyclerView recyclerView;
     private TaskAdapter taskAdapter;
+    List<Task> allTasks;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +56,7 @@ public class TaskListFragment extends Fragment {
 
         //get Tasks from DB using TaskLab helper class
         TaskLab taskLab = TaskLab.get(getActivity());
-        List<Task> allTasks = taskLab.getTasksFromDB();
+        allTasks = taskLab.getTasksFromDB();
 
         if(taskAdapter == null){
 
@@ -116,18 +119,51 @@ public class TaskListFragment extends Fragment {
         //Onclick handler to the item in the list view
 
         @Override
-        public void onClick(View view) {
+        public void onClick(final View view) {
 //            Toast.makeText(getActivity(), bindedTask.getTitle(), Toast.LENGTH_SHORT).show();
 
             if(view.getId() == isDone.getId()){
-                CheckBox v = (CheckBox) view;
-                bindedTask.setIs_done(v.isChecked());
-                TaskLab.get(getActivity()).updateTask(bindedTask);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setTitle(getString(R.string.label_are_you_share_task_complete))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                setTaskUpdate(view, bindedTask, getAdapterPosition());
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                CheckBox v = (CheckBox) view;
+                                v.setChecked(false);
+                            }
+                        })
+                        .show();
             }
             else{
                 Intent intent = TaskDetailActivity.newIntent(getActivity(), getString(R.string.app_constant_show_existing_task) ,bindedTask.getUuid());
                 startActivity(intent);
             }
+        }
+
+        private void setTaskUpdate(View view, Task bindedTask, int bindedPosition){
+            //set Done in DB
+            CheckBox v = (CheckBox) view;
+            bindedTask.setIs_done(v.isChecked());
+            TaskLab.get(getActivity()).updateTask(bindedTask);
+
+            //remove the done list item from the list. bindedPosition is accessed through getAdapterPosition()
+            removeTaskFromView(bindedPosition);
+        }
+        public void removeTaskFromView(int bindedPosition){
+            //remove the task from the logical model(not DB) from which the Recycler View was generated
+            allTasks.remove(bindedPosition);
+            //notify the Adapter that the Item an item has been removed from its logical model data set
+            taskAdapter.notifyItemRemoved(bindedPosition);
+            taskAdapter.notifyItemRangeChanged(bindedPosition, allTasks.size());
         }
     }
     //Adapter of the RecyclerView

@@ -75,7 +75,7 @@ public class TaskLab {
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.DESCRIPTION, task.getDescription());
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.TASK_DATE, CommonLibrary.handleDateToMilliseconds(task.getTask_date()));
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.PRIORITY, task.getPriority());
-        contentValues.put(TaskDBSchema.AllTasksTable.Cols.IS_DONE, task.getIs_done() ? 1 : 0);
+        contentValues.put(TaskDBSchema.AllTasksTable.Cols.IS_DONE, task.getIs_done() ? "yes" : "no");
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_CREATED, CommonLibrary.handleDateToMilliseconds(task.getDate_created()));
         contentValues.put(TaskDBSchema.AllTasksTable.Cols.DATE_DONE, CommonLibrary.handleDateToMilliseconds(task.getDate_done()));
 
@@ -112,7 +112,13 @@ public class TaskLab {
 
     public List<Task> getTasksFromDB(){
         List<Task> tasks = new ArrayList<>();
-        TaskCursorWrapper cursor = queryTasks(null, null);
+
+        //Retrieve only tasks that are incomplete
+        TaskCursorWrapper cursor = queryTasks(TaskDBSchema.AllTasksTable.Cols.IS_DONE + " = ?", new String[]{"no"} );
+//        TaskCursorWrapper cursor = queryTasks(null, null);
+
+
+
 
         try{
             cursor.moveToFirst();

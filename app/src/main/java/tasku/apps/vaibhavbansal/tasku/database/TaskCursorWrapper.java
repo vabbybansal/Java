@@ -25,7 +25,7 @@ public class TaskCursorWrapper extends CursorWrapper {
             String description = getString(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.DESCRIPTION));
             long task_date = getLong(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.TASK_DATE));
             String priority = getString(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.PRIORITY));
-            int is_done = getInt(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.IS_DONE));
+            String is_done = getString(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.IS_DONE));
             long date_created = getLong(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.DATE_CREATED));
             long date_done = getLong(getColumnIndex(TaskDBSchema.AllTasksTable.Cols.DATE_DONE));
 
@@ -35,7 +35,7 @@ public class TaskCursorWrapper extends CursorWrapper {
             task.setDescription(description);
             task.setTask_date(new Date(task_date));
             task.setPriority(priority);
-            task.setIs_done(is_done == 1);
+            task.setIs_done(is_done.equals(new String("yes")));
             task.setDate_created(new Date(date_created));
             task.setDate_done(new Date(date_done));
             return task;
