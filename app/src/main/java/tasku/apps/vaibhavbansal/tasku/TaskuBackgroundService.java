@@ -12,6 +12,11 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 /**
@@ -57,7 +62,7 @@ public class TaskuBackgroundService extends IntentService {
 
         Notification notification = new NotificationCompat.Builder(this)
                 .setTicker(getString(R.string.title_your_task))
-                .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                .setSmallIcon(R.mipmap.ic_launcher_custom)
                 .setContentTitle(alarmedTask.getTitle())
                 .setContentText(CommonLibrary.handleModelToViewTime(this,alarmedTask.getTask_date()) + ", " + CommonLibrary.handleModelToViewDate(this, alarmedTask.getTask_date())).build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
@@ -66,7 +71,12 @@ public class TaskuBackgroundService extends IntentService {
     }
 
     //Alarm Manager handled service
-    public static void setServiceAlarm (Context context, boolean isOn, Task taskToBeAlarmed){
+    public static void setServiceAlarm (Context context, boolean isOn){
+
+        Task taskToBeAlarmed = getLatestTask(context);
+
+//        if task date is in the past, then return
+
 
         boolean alarmStatus = isServiceAlarmOn(context);
         Intent i = TaskuBackgroundService.newIntent(context, taskToBeAlarmed);
@@ -80,10 +90,11 @@ public class TaskuBackgroundService extends IntentService {
         //                              Flags to tweak how Pending Request is created
         //                          )
         PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
-//        PendingIntent pi = PendingIntent.getActivity(context,99659, i, 0 );
-
-
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if(taskToBeAlarmed == null){
+            flushAlarms(alarmManager, pi);
+            return;
+        }
         //no alarm in stack
         if(!alarmStatus){
             //Arguments to setInexactRepeating =>
@@ -97,17 +108,39 @@ public class TaskuBackgroundService extends IntentService {
         }
         else{
             //an alarm already in stack
-            alarmManager.cancel(pi);
-            pi.cancel();
+            flushAlarms(alarmManager, pi);
             pi = PendingIntent.getService(context, 0, i, 0);
         }
         alarmManager.set(AlarmManager.RTC_WAKEUP, taskToBeAlarmed.getTask_date().getTime(), pi);
+    }
+
+    public static void flushAlarms(AlarmManager alarmManager, PendingIntent pi){
+        alarmManager.cancel(pi);
+        pi.cancel();
     }
 
     public static boolean isServiceAlarmOn(Context context){
         Intent i = TaskuBackgroundService.newIntent(context);
         PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
         return pi != null;
+    }
+    public static Task getLatestTask(Context context){
+        List<Task> allTasks = TaskLab.get(context).getTasksFromDB();
+        SortedSet<Date> allDates = new TreeSet<Date>();
+        Task latestTask = null;
+        for(int i=0; i<allTasks.size(); i++){
+            Date d = allTasks.get(i).getTask_date();
+            //Time not starting time nor time should be in past
+            if(d.getTime() != new Date(0).getTime() && d.after(new Date())){
+                allDates.add(d);
+                if(d.equals(allDates.first())){
+                    latestTask = allTasks.get(i);
+                }
+            }
+        }
+
+        return latestTask;
+
     }
 
 }

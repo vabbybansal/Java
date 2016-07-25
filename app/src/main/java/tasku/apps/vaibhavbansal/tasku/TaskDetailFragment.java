@@ -156,7 +156,7 @@ public class TaskDetailFragment extends Fragment{
                     else{
                         toastAway(false);
                     }
-                    updateAlarmManager(newTask);
+                    updateAlarmManager();
                     getActivity().finish();
                 }
             });
@@ -203,7 +203,7 @@ public class TaskDetailFragment extends Fragment{
                                 } else {
                                     toastAway(false);
                                 }
-                                updateAlarmManager(taskToBeUpdated);
+                                updateAlarmManager();
                                 getActivity().finish();
 
                             }
@@ -221,8 +221,8 @@ public class TaskDetailFragment extends Fragment{
         });
 
     }
-    public void updateAlarmManager(Task taskToBeAlarmed){
-        TaskuBackgroundService.setServiceAlarm(getActivity(), true, taskToBeAlarmed);
+    public void updateAlarmManager(){
+        TaskuBackgroundService.setServiceAlarm(getActivity(), true);
     }
     private void handleCompleteButtonIsTrue(View view){
         completeButton = (Button) view.findViewById(R.id.id_detail_view_complete_task);
@@ -322,6 +322,7 @@ public class TaskDetailFragment extends Fragment{
                                 } else {
                                     toastAway(false);
                                 }
+                                updateAlarmManager();
                                 getActivity().finish();
                             }
                         })
@@ -394,6 +395,7 @@ public class TaskDetailFragment extends Fragment{
         Calendar c = CommonLibrary.setCalendarFromMilliSec(taskDate.getTime());
         c.set(Calendar.HOUR_OF_DAY, hour);
         c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, 0);
 //        updateTaskDate(CommonLibrary.calendarToDate(c));
         taskDate = CommonLibrary.calendarToDate(c);
         timePickerTextView.setText(CommonLibrary.handleModelToViewTime(getActivity(), taskDate));
