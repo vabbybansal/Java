@@ -2,7 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="7dp"
+    android:layout_marginRight="7dp"
+    android:background="@drawable/list_item_back"
+    android:layout_marginTop="7dp"
+    android:padding="7dp"
+
+
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,11 +22,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/id_task_title"
-
             tools:text="Email Sophia"
             android:padding="4dp"
+            android:textSize="18sp"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="4sp"
+            
             />
         <TextView
             android:layout_width="wrap_content"
@@ -63,6 +72,7 @@
             android:gravity="right"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
+
             />
 
     </RelativeLayout>

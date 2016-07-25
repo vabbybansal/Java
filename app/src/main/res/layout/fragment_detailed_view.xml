@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     android:paddingTop="20dp"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:background="#c57dd2">
 
     <TextView
         android:layout_width="match_parent"
@@ -33,6 +34,8 @@
                 android:hint="What's Your Task?"
                 android:id="@+id/id_detail_view_task_title"
                 android:textSize="16sp"
+                android:inputType="textCapWords"
+                android:singleLine="true"
                 >
 
             </EditText>
@@ -52,6 +55,7 @@
                 android:hint="Remarks / Notes"
                 android:id="@+id/id_detail_view_task_description"
                 android:textSize="16sp"
+                android:inputType="textCapSentences"
                 >
 
             </EditText>
