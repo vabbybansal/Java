@@ -7,7 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.media.RingtoneManager;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -50,7 +52,7 @@ public class TaskuBackgroundService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i(TAG, "Received an intent:" + intent);
+//        Log.i(TAG, "Received an intent:" + intent);
 //        Log.i(TAG, "Recieved " + intent.getSerializableExtra(EXTRA_TASK_TITLE));
 
         UUID taskId = (UUID) intent.getSerializableExtra(EXTRA_TASK_UUID);
@@ -62,12 +64,14 @@ public class TaskuBackgroundService extends IntentService {
 
         Notification notification = new NotificationCompat.Builder(this)
                 .setTicker(getString(R.string.title_your_task))
-                .setSmallIcon(R.mipmap.ic_launcher_custom)
+                .setSmallIcon(R.drawable.ic_notif_icon)
                 .setContentTitle(alarmedTask.getTitle())
-                .setContentText(CommonLibrary.handleModelToViewTime(this,alarmedTask.getTask_date()) + ", " + CommonLibrary.handleModelToViewDate(this, alarmedTask.getTask_date())).build();
+                .setContentText(CommonLibrary.handleModelToViewTime(this,alarmedTask.getTask_date()) + ", " + CommonLibrary.handleModelToViewDate(this, alarmedTask.getTask_date()))
+                .setVibrate(new long[]{1000,1000,1000,1000,1000})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(0, notification);
-
     }
 
     //Alarm Manager handled service
