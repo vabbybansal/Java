@@ -1,12 +1,14 @@
 package tasku.apps.vaibhavbansal.tasku;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -282,14 +285,32 @@ public class TaskDetailFragment extends Fragment{
         switch(item.getItemId()){
 
             case(R.id.id_menu_item_delete):
-                int deleteStatus = TaskLab.get(getActivity()).deleteTask(taskId);
-                if(deleteStatus != 0){
-                    toastAway(true);
-                }
-                else{
-                    toastAway(false);
-                }
-                getActivity().finish();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setTitle(getString(R.string.sure_you_want_to_delete))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                int deleteStatus = TaskLab.get(getActivity()).deleteTask(taskId);
+                                if(deleteStatus != 0){
+                                    toastAway(true);
+                                }
+                                else{
+                                    toastAway(false);
+                                }
+                                getActivity().finish();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        })
+                        .show();
+
+
+
                 return true;
             default:return super.onOptionsItemSelected(item);
         }

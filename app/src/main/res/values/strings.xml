@@ -20,5 +20,6 @@
     <string name="choose_task_date">Choose the task Date</string>
     <string name="time_not_set">Time Not Set</string>
     <string name="label_are_you_share_task_complete">Are you sure the Task is Complete?</string>
+    <string name="sure_you_want_to_delete">Are you sure you want to delete this Task?</string>
 
 </resources>
