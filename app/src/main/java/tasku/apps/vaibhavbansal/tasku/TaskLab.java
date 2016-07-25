@@ -50,6 +50,21 @@ public class TaskLab {
 
         return new TaskCursorWrapper(cursor);
     }
+
+    private TaskCursorWrapper queryTasks(String whereClause, String[] whereArgs, String orderBy){
+        Cursor cursor = sqLiteDatabase.query(
+                TaskDBSchema.AllTasksTable.NAME,
+                null,//Cols to select. null selects all cols
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                orderBy
+        );
+
+        return new TaskCursorWrapper(cursor);
+    }
+
     //get Task from the database from the provided uuid
     public Task getTask(UUID uuid){
         TaskCursorWrapper cursor = queryTasks(TaskDBSchema.AllTasksTable.Cols.UUID + " = ?", new String[]{uuid.toString()});
@@ -114,10 +129,22 @@ public class TaskLab {
         List<Task> tasks = new ArrayList<>();
 
         //Retrieve only tasks that are incomplete
-        TaskCursorWrapper cursor = queryTasks(TaskDBSchema.AllTasksTable.Cols.IS_DONE + " = ?", new String[]{"no"} );
+//        TaskCursorWrapper cursor = queryTasks(TaskDBSchema.AllTasksTable.Cols.IS_DONE + " = ?", new String[]{"no"} );
+        TaskCursorWrapper cursor = queryTasks(TaskDBSchema.AllTasksTable.Cols.IS_DONE + " = ?", new String[]{"no"}, new String(TaskDBSchema.AllTasksTable.Cols.TASK_DATE + " ASC") );
+
+
 //        TaskCursorWrapper cursor = queryTasks(null, null);
-
-
+//
+//        Cursor cursor1 = sqLiteDatabase.query(
+//                TaskDBSchema.AllTasksTable.Cols.IS_DONE,
+//                null,//Cols to select. null selects all cols
+//                TaskDBSchema.AllTasksTable.Cols.IS_DONE + " = ?",
+//                new String[]{"no"},
+//                null,
+//                null,
+//                null
+//        );
+//        TaskCursorWrapper cursor = (TaskCursorWrapper);
 
 
         try{
