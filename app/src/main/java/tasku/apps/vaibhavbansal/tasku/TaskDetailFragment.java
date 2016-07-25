@@ -156,6 +156,7 @@ public class TaskDetailFragment extends Fragment{
                     else{
                         toastAway(false);
                     }
+                    updateAlarmManager(newTask);
                     getActivity().finish();
                 }
             });
@@ -188,17 +189,40 @@ public class TaskDetailFragment extends Fragment{
         updateTaskButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Task taskToBeUpdated = TaskLab.get(getActivity()).getTask(taskId);
-                int updateStatus = TaskLab.get(getActivity()).updateTask(setViewInputsIntoTask(false, taskToBeUpdated));
-                if(updateStatus > 0){
-                    toastAway(true);
-                }
-                else{
-                    toastAway(false);
-                }
-                getActivity().finish();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setTitle(getString(R.string.sure_you_want_to_update))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Task taskToBeUpdated = TaskLab.get(getActivity()).getTask(taskId);
+                                int updateStatus = TaskLab.get(getActivity()).updateTask(setViewInputsIntoTask(false, taskToBeUpdated));
+                                if (updateStatus > 0) {
+                                    toastAway(true);
+                                } else {
+                                    toastAway(false);
+                                }
+                                updateAlarmManager(taskToBeUpdated);
+                                getActivity().finish();
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        })
+                        .show();
+
+
+
             }
         });
+
+    }
+    public void updateAlarmManager(Task taskToBeAlarmed){
+        TaskuBackgroundService.setServiceAlarm(getActivity(), true, taskToBeAlarmed);
     }
     private void handleCompleteButtonIsTrue(View view){
         completeButton = (Button) view.findViewById(R.id.id_detail_view_complete_task);
@@ -293,10 +317,9 @@ public class TaskDetailFragment extends Fragment{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 int deleteStatus = TaskLab.get(getActivity()).deleteTask(taskId);
-                                if(deleteStatus != 0){
+                                if (deleteStatus != 0) {
                                     toastAway(true);
-                                }
-                                else{
+                                } else {
                                     toastAway(false);
                                 }
                                 getActivity().finish();

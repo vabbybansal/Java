@@ -35,6 +35,11 @@ public class TaskListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //Will have a menu and will recieve Menu Call Backs
         setHasOptionsMenu(true);
+
+        /////////////////////////
+        /////////////////////////
+
+
     }
 
     @Nullable

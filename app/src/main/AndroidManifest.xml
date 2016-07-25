@@ -22,6 +22,7 @@
             >
             <!--android:label="@string/label_task_detail"-->
         </activity>
+        <service android:name=".TaskuBackgroundService"></service>
     </application>
 
 </manifest>
