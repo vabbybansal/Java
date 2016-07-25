@@ -34,7 +34,9 @@ public class TaskuBackgroundService extends IntentService {
 
     public static Intent newIntent(Context context, Task taskForAlarm){
         Intent intent = new Intent(context, TaskuBackgroundService.class);
-        intent.putExtra(TaskuBackgroundService.EXTRA_TASK_UUID, taskForAlarm.getUuid());
+        if(taskForAlarm != null){
+            intent.putExtra(TaskuBackgroundService.EXTRA_TASK_UUID, taskForAlarm.getUuid());
+        }
 //        intent.setAction(TaskuBackgroundService.TASKU_SERVICE);
         return intent;
     }
@@ -57,11 +59,12 @@ public class TaskuBackgroundService extends IntentService {
 
         UUID taskId = (UUID) intent.getSerializableExtra(EXTRA_TASK_UUID);
         Task alarmedTask = TaskLab.get(this).getTask(taskId);
-//        Resources resources = getResources();
-//        Intent i = TaskDetailActivity.newIntent(this,getString(R.string.app_constant_show_existing_task), taskId);
+/////////////////////////////////////
+        Resources resources = getResources();
+        Intent i = TaskDetailActivity.newIntent(this,getString(R.string.app_constant_show_existing_task), taskId);
 //
-//        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-
+        PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+////////////////////////////////////
         Notification notification = new NotificationCompat.Builder(this)
                 .setTicker(getString(R.string.title_your_task))
                 .setSmallIcon(R.drawable.ic_notif_icon)
@@ -69,13 +72,16 @@ public class TaskuBackgroundService extends IntentService {
                 .setContentText(CommonLibrary.handleModelToViewTime(this,alarmedTask.getTask_date()) + ", " + CommonLibrary.handleModelToViewDate(this, alarmedTask.getTask_date()))
                 .setVibrate(new long[]{1000,1000,1000,1000,1000})
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .build();
+                        .setContentIntent(pi)
+                        .setAutoCancel(true)
+                        .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(0, notification);
+        CommonLibrary.updateAlarmManager(this);
     }
 
     //Alarm Manager handled service
-    public static void setServiceAlarm (Context context, boolean isOn){
+    public static void setServiceAlarm (Context context){
 
         Task taskToBeAlarmed = getLatestTask(context);
 
@@ -134,7 +140,7 @@ public class TaskuBackgroundService extends IntentService {
         Task latestTask = null;
         for(int i=0; i<allTasks.size(); i++){
             Date d = allTasks.get(i).getTask_date();
-            //Time not starting time nor time should be in past
+            //Time not starting time nor time should be in past. In future those tasks can also be avoided which have been set to no alarms
             if(d.getTime() != new Date(0).getTime() && d.after(new Date())){
                 allDates.add(d);
                 if(d.equals(allDates.first())){

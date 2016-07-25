@@ -136,7 +136,6 @@ public class TaskListFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 setTaskUpdate(view, bindedTask, getAdapterPosition());
-
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -159,7 +158,7 @@ public class TaskListFragment extends Fragment {
             CheckBox v = (CheckBox) view;
             bindedTask.setIs_done(v.isChecked());
             TaskLab.get(getActivity()).updateTask(bindedTask);
-
+            CommonLibrary.updateAlarmManager(getActivity());
             //remove the done list item from the list. bindedPosition is accessed through getAdapterPosition()
             removeTaskFromView(bindedPosition);
         }

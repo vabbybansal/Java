@@ -156,7 +156,7 @@ public class TaskDetailFragment extends Fragment{
                     else{
                         toastAway(false);
                     }
-                    updateAlarmManager();
+                    CommonLibrary.updateAlarmManager(getActivity());
                     getActivity().finish();
                 }
             });
@@ -203,7 +203,7 @@ public class TaskDetailFragment extends Fragment{
                                 } else {
                                     toastAway(false);
                                 }
-                                updateAlarmManager();
+                                CommonLibrary.updateAlarmManager(getActivity());
                                 getActivity().finish();
 
                             }
@@ -221,27 +221,42 @@ public class TaskDetailFragment extends Fragment{
         });
 
     }
-    public void updateAlarmManager(){
-        TaskuBackgroundService.setServiceAlarm(getActivity(), true);
-    }
+
     private void handleCompleteButtonIsTrue(View view){
         completeButton = (Button) view.findViewById(R.id.id_detail_view_complete_task);
         completeButton.setVisibility(View.VISIBLE);
         completeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Task taskToBeCompleted = TaskLab.get(getActivity()).getTask(taskId);
-                taskToBeCompleted.setIs_done(true);
-                TaskLab.get(getActivity()).updateTask(taskToBeCompleted);
 
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_SHORT).show();
-                        getActivity().finish();
-                    }
-                }, 400);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder
+                        .setTitle(getString(R.string.sure_you_want_to_update))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Task taskToBeCompleted = TaskLab.get(getActivity()).getTask(taskId);
+                                taskToBeCompleted.setIs_done(true);
+                                TaskLab.get(getActivity()).updateTask(taskToBeCompleted);
+                                CommonLibrary.updateAlarmManager(getActivity());
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getActivity(), "Task Completed", Toast.LENGTH_SHORT).show();
+                                        getActivity().finish();
+                                    }
+                                }, 400);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        })
+                        .show();
+
             }
         });
     }
@@ -322,7 +337,7 @@ public class TaskDetailFragment extends Fragment{
                                 } else {
                                     toastAway(false);
                                 }
-                                updateAlarmManager();
+                                CommonLibrary.updateAlarmManager(getActivity());
                                 getActivity().finish();
                             }
                         })

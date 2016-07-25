@@ -94,6 +94,9 @@ public class CommonLibrary {
         return calendarToDate(cOld);
     }
 
+    public static void updateAlarmManager(Context context){
+        TaskuBackgroundService.setServiceAlarm(context);
+    }
 
 
 }
