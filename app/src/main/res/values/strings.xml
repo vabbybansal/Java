@@ -23,5 +23,6 @@
     <string name="sure_you_want_to_delete">Are you sure you want to delete this Task?</string>
     <string name="sure_you_want_to_update">Are you sure you want to update this Task?</string>
     <string name="title_your_task">Your Task</string>
+    <string name="sure_you_want_to_complete">Are you sure you want to complete this Task?</string>
 
 </resources>

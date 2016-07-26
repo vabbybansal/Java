@@ -232,7 +232,7 @@ public class TaskDetailFragment extends Fragment{
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder
-                        .setTitle(getString(R.string.sure_you_want_to_update))
+                        .setTitle(getString(R.string.sure_you_want_to_complete))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

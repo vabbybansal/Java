@@ -117,7 +117,13 @@ public class TaskListFragment extends Fragment {
             title.setText(task.getTitle());
             task_date.setText(CommonLibrary.handleModelToViewDate(getActivity(), task.getTask_date()));
             task_time.setText(CommonLibrary.handleModelToViewTime(getActivity(), task.getTask_date()));
-            description.setText(task.getDescription());
+            //handle null of description field
+            if(task.getDescription().equals(new String())){
+                description.setVisibility(View.GONE);
+            }
+            else{
+                description.setText(task.getDescription());
+            }
             priority.setText(task.getPriority());
             isDone.setChecked(task.getIs_done());
         }
