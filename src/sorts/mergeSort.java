@@ -2,7 +2,7 @@ package sorts;
 
 public class mergeSort{
 	
-	static public int[] myArray = {8,7,6,5,4,3,2,1,9};
+	static public int[] myArray = {8,7,6,10,20,2000,5,4,3,2,1,9};
 		
 	public static String arrayToString(){
 		int len = myArray.length;
@@ -81,25 +81,21 @@ public class mergeSort{
 		{
 			if(counterA == lenA)
 			{
-				finalArray[i] = b[counterB];
-				counterB++;
+				finalArray[i] = b[counterB++];
 			}
 			else if(counterB == lenB)
 			{
-				finalArray[i] = a[counterA];
-				counterA++;
+				finalArray[i] = a[counterA++];
 			}
 			else
 			{
 				if(a[counterA] <= b[counterB])
 				{
-					finalArray[i] = a[counterA];
-					counterA++;
+					finalArray[i] = a[counterA++];
 				}
 				else
 				{
-					finalArray[i] = b[counterB];
-					counterB++;
+					finalArray[i] = b[counterB++];
 				}
 			}
 			

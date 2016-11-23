@@ -84,10 +84,10 @@ public class sortGraphic extends Application{
 //		new Thread(task).start();
 		
 		
-		mergeSort obj = new mergeSort();
-		System.out.println(mergeSort.arrayToString(obj.myArray));
-		obj.myArray = obj.myMergeSort(obj.myArray);
-		System.out.println(mergeSort.arrayToString(obj.myArray));
+		heapSort obj = new heapSort();
+		System.out.println(heapSort.arrayToString(obj.myArray));
+		obj.myArray = obj.myHeapSort(obj.myArray);
+		System.out.println(heapSort.arrayToString(obj.myArray));
 		
 		
 		
