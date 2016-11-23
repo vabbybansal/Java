@@ -4,7 +4,7 @@ package sorts;
 
 public class insertionSorts{
 	static public int[] myArray = {5,3,8,10,12,11,9,4,7,4,11,15,3,3,10,8,9,6,4};
-//	static public int[] myArray = {5,6,5};
+//	static public int[] myArray = {1,11,10,2,0};
 	public static final boolean USE_GRAPHIC = true; 
 	public static final int ANIMATION_DELAY = 500;
 	
@@ -196,98 +196,6 @@ public int[] insertionSortBinary(int[] myArray, int graphic){
 
 
 
-public int[] insertionSortBinary(int[] myArray){
-	
-	int length = myArray.length;
-	int temp = 0;
-	
-	
-	
-	for(int i=1; i<length; i++)
-	{
-		findIndexInSortedArray(myArray, 0, i, myArray[i]);
-//		reArrangeValInArray(myArray, i, foundIndex);
-		
-		if(myArray[i] <= myArray[foundIndex])
-		{
-//			foundIndex--;
-			reArrangeValInArray(myArray, i, foundIndex);
-		}
-		else if(myArray[i] > myArray[foundIndex])
-		{
-			foundIndex++;
-			reArrangeValInArray(myArray, i, foundIndex);
-		}
-		else if(myArray[i] == myArray[foundIndex] )
-		{
-			
-		}
-//		
-		
-		
-		
-	}
-	
-	return myArray;
-}
-
-
-
-
-
-//Returns the index and not the value
-public static void findIndexInSortedArray(int[] myArray, int begin, int end, int searchItem)
-{
-	
-	if(end == begin)
-	{
-		foundIndex = end;
-		return;
-	}
-	
-	int mid = begin + (end - begin)/2;
-	
-	if(searchItem < myArray[mid])
-	{
-		if(begin == mid)
-		{
-			foundIndex = begin;
-			return;
-		}
-		else
-		{
-			findIndexInSortedArray(myArray, begin, mid - 1, searchItem);
-		}
-		
-	}
-	else if(searchItem > myArray[mid])
-	{
-		if(mid == end)
-		{
-			foundIndex = mid;
-			return;
-		}
-		else
-		{
-			findIndexInSortedArray(myArray, mid + 1, end, searchItem);
-		}
-		
-	}
-	else
-	{
-		foundIndex = mid;
-		return;
-	}
-	
-	return;
-	
-}
-
-
-
-
-
-
 
 
 //Returns the index and not the value
@@ -398,6 +306,49 @@ public static int[] reArrangeValInArray(int[] myArray, int indexFrom, int indexT
 	
 	
 	return myArray;
+}
+
+
+public int[] insertionSortBinary(int[] myArray){
+	
+	int length = myArray.length;
+	int temp = 0;
+	
+	int binaryIndex = -1;
+	
+	for(int i=1; i<length; i++)
+	{
+		binaryIndex = returnBinarySearchedIndex(myArray, 0, i-1, myArray[i]);
+		reArrangeValInArray(myArray, i, binaryIndex);		
+	}
+	
+	return myArray;
+}
+
+
+
+
+//Reimplementation of binary search to retrieve the index in sorted array
+public static int returnBinarySearchedIndex(int[] myArray, int begin, int end, int searchItem)
+{	
+	if(end <= begin)
+	{
+		return((searchItem < myArray[begin] ? begin : begin + 1));
+	}
+	int mid = (begin + end)/2;
+	
+	if(searchItem < myArray[mid])
+	{
+		return(returnBinarySearchedIndex(myArray, begin, mid - 1, searchItem));	
+	}
+	else if(searchItem > myArray[mid])
+	{
+		return(returnBinarySearchedIndex(myArray, mid + 1, end, searchItem));
+	}
+	else
+	{
+		return(mid + 1);
+	}	
 }
 
 public static int[] reArrangeValInArray(int[] myArray, int indexFrom, int indexTo){

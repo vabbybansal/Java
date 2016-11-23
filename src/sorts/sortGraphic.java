@@ -61,38 +61,35 @@ public class sortGraphic extends Application{
 		primaryStage.show();
 		
 		
+		///////UNCOMMENT BELOW TO START GRAPHICAL SORT
+//		startGrid();
+//		
+//		Task task = new Task<Void>(){
+//
+//			@Override
+//			protected Void call() throws Exception {
+//
+//				
+//				insertionSorts obj = new insertionSorts();
+//				
+//
+////				insertionSorts.myArray = obj.insertionSortBasic(insertionSorts.myArray, 1);
+//				obj.insertionSortBinary(insertionSorts.myArray, 1);
+//
+//				
+//				return null;
+//			}
+//			
+//		};
+//		new Thread(task).start();
 		
-		startGrid();
 		
-		Task task = new Task<Void>(){
-
-			@Override
-			protected Void call() throws Exception {
-
-				
-				insertionSorts obj = new insertionSorts();
-				
-
-//				insertionSorts.myArray = obj.insertionSortBasic(insertionSorts.myArray, 1);
-				obj.insertionSortBinary(insertionSorts.myArray, 1);
-
-				
-				return null;
-			}
-			
-		};
-		new Thread(task).start();
+		mergeSort obj = new mergeSort();
+		System.out.println(mergeSort.arrayToString(obj.myArray));
+		obj.myArray = obj.myMergeSort(obj.myArray);
+		System.out.println(mergeSort.arrayToString(obj.myArray));
 		
-//		System.out.println(insertionSorts.arrayToString());
-//		insertionSorts obj = new insertionSorts();
-//		obj.insertionSortBinary(insertionSorts.myArray, 1);
-//		System.out.println(insertionSorts.arrayToString());
-//		insertionSorts.findIndexInSortedArray(obj.myArray, 0, obj.myArray.length-1, 0);
-//		System.out.println("SEARCHED INDEX: " + insertionSorts.foundIndex);
-//		System.out.println(insertionSorts.arrayToString());
-//		insertionSorts.reArrangeValInArray(obj.myArray, 0, 9);
 		
-//		System.out.println(insertionSorts.arrayToString());
 		
 	}
 	
