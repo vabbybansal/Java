@@ -1,6 +1,8 @@
 
 package edu.cmu.andrew.vaibhavb;
 
+import edu.cmu.andrew.vaibhavb.model.BeerOutlet;
+import edu.cmu.andrew.vaibhavb.model.BeerOutletBusinessLogic;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,14 +31,7 @@ import org.json.simple.parser.ParseException;
 @WebServlet(name = "RESTBeerOutletsService", urlPatterns = {"/RESTBeerOutletsService/*"})
 public class RESTBeerOutletsService extends HttpServlet {
 
-    //API KEY for the beermapping web API
-    public static final String BEER_MAPPING_API_KEY = "92bcf9cbd660aeefda899eab01ebc943";
     
-    //WebService endpoint for list of outlets by city name
-    public static final String BEER_MAPPING_ENDPOINT_BY_CITYNAME  = "http://beermapping.com/webservice/loccity/" + RESTBeerOutletsService.BEER_MAPPING_API_KEY +  "/";
-    
-    //constant string to be appended to each hit to beer mapping to fetch JSON instead of XML
-    public static final String REQUEST_JSON_CONSTANT = "&s=json";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,79 +42,75 @@ public class RESTBeerOutletsService extends HttpServlet {
         
         
         String cityName = getQuery.substring(getQuery.indexOf("=")+1);
-        //check if query is empty        
+        
+        int indexOfSpace;
+        //handle spaces in the city name
+        if((indexOfSpace = cityName.indexOf(" ")) >=0)
+        {
+            cityName = cityName.replaceAll(" ", "%20");
+        }
         
         
-        //////////////////////////////// HANDLE SPACES in CITY, HANDLE NO QUERY
         
         
+        //If query is empty
         if(cityName.length() == 0)
             cityName = "Pittsburgh";
         
         //Fetch outlets by the city name
-        String beerMappingResponse = fetchOutletsByCityName(cityName);
+        String beerMappingResponse = BeerOutletBusinessLogic.fetchOutletsByCityName(cityName);
 
         //Reformat the String API response
-        beerMappingResponse = reFormatAPIResponse(beerMappingResponse);
+        beerMappingResponse = BeerOutletBusinessLogic.reFormatAPIResponse(beerMappingResponse);
         
         //Form a JSON from the API response
-        List listOfBeerOutlets = RESTBeerOutletsService.objectifyJson(beerMappingResponse);
+        List listOfBeerOutlets = BeerOutletBusinessLogic.objectifyJson(beerMappingResponse);
         
         //Sort the list according to the overall rating in the descending order
         Collections.sort(listOfBeerOutlets);
-              
-        //Send all the data back to client
-        //Covert the required jsonobjects to jsonarray and then string
-        JSONArray jsonArrayToSend = reJSONifyForOutput(listOfBeerOutlets, 0, listOfBeerOutlets.size()-1);
-        String jsonArrayString = jsonArrayToSend.toJSONString();
+                              
+        //Choose the view in this section
+        //Right now we have just one view for the service. It gets the top 10 beer outlets
+        //Uses model's subsetBeerOutletsList function for this
+        List<BeerOutlet> listOfBeerOutletsFinal = BeerOutlet.subsetBeerOutletsList(listOfBeerOutlets, 0, BeerOutlet.MAX_BEER_OUTLETS);
         
-        printOnHtml(request, response, jsonArrayString);
-
-    }
-
-    public static String reFormatAPIResponse(String apiResponse){
-        apiResponse = apiResponse.replace("\\", "");
-        return apiResponse;
-    }
-    
-    //Method to fetch the beer outlets list based on the city
-    public String fetchOutletsByCityName(String cityName){
+        //Set Response Type
+        response.setContentType("application/json;charset=UTF-8");
         
-        String beerMappingAPI = RESTBeerOutletsService.BEER_MAPPING_ENDPOINT_BY_CITYNAME + cityName + RESTBeerOutletsService.REQUEST_JSON_CONSTANT;
-        
-        String returnedResponse = fetchDataFromExternalAPI(beerMappingAPI);
-        
-        return returnedResponse;
-        
-    }
-
-    public static String fetchDataFromExternalAPI(String urlString){
-        
-        String response = "";
-        try {
-            URL url = new URL(urlString);
-            
-            //Create an HttpURLConnection
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            
-            // Read all the text returned by the server
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-            String str;
-            
-            // Read each line of "in" until done, adding each to "response"
-            while ((str = in.readLine()) != null) {
-                // str is one line of text readLine() strips newline characters
-                response += str;
-            }
-            in.close();
-        } catch (IOException e) {
-            System.out.println("Eeek, an exception");
-            // Do something reasonable.  This is left for students to do.
+        //HTTP Status Codes
+        if(listOfBeerOutletsFinal.size() == 0)
+        {
+            response.setStatus(503);
+        }
+        else
+        {
+            response.setStatus(200); 
         }
         
-        return response;
+        //Route to setViewAsJson for sending the model data to JSON, and then send it
+        setViewAsJson(request, response, listOfBeerOutletsFinal);
+
     }
     
+    
+    private static void setViewAsJson(HttpServletRequest request, HttpServletResponse response, List<BeerOutlet> listOfBeerOutlets) {
+        
+        try {
+
+        //set the request parameters to the jsp
+        request.setAttribute("listOfBeerOutlets", listOfBeerOutlets);
+
+        //Dispatch to the response page
+        request.getRequestDispatcher("/view_make_json.jsp").forward(request, response);
+        
+        } catch (ServletException ex) {
+            Logger.getLogger(RESTBeerOutletsService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(RESTBeerOutletsService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     
     @Override
     public String getServletInfo() {
@@ -127,70 +118,7 @@ public class RESTBeerOutletsService extends HttpServlet {
         return "Short description";
     }
 
-    public static List<BeerOutlet> objectifyJson(String beerMappingResponse) {
-        
-        //Access information from the JSON object
-        JSONParser parser = new JSONParser();
-
-        //List of beeroutlets
-        List<BeerOutlet> listOfBeerOutlets = new ArrayList<BeerOutlet>();        
-        
-        //Get access to all the variables fetched from the client
-        try {
-            //Parse the jsonText to fetch various variables in the json
-            Object obj = parser.parse(beerMappingResponse);
-            
-            //Create json Array for the list returned
-            JSONArray jsonArray = (JSONArray) obj;
-            int jsonArraySize = jsonArray.size();
-            
-            
-            
-            //Temporary variables
-            BeerOutlet beerOutlet;
-            JSONObject jsonObj;
-            
-            //Add all the outlets in the list
-            for(int i=0; i<jsonArraySize; i++)
-            {
-                jsonObj = (JSONObject) jsonArray.get(i);
-                beerOutlet = new BeerOutlet(jsonObj, jsonObj.get("overall").toString());
-                listOfBeerOutlets.add(beerOutlet);
-            }
-            
-        } catch (ParseException pe) {
-            System.out.println("position: " + pe.getPosition());
-            System.out.println(pe);            
-        }
-
-        return listOfBeerOutlets;
-        
-    }
-
-    private void printOnHtml(HttpServletRequest request, HttpServletResponse response, String message) {
-        
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            
-            out.println(message);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(RESTBeerOutletsService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-
-    //Helper method to stick startIndex to endIndex json objects in a JSON Array
-    private JSONArray reJSONifyForOutput(List<BeerOutlet> listOfBeerOutlets, int startIndex, int endIndex) {
-        
-        JSONArray jsonArrayToSend = new JSONArray();
-        for(int i=startIndex; i <= endIndex; i++)
-        {            
-            jsonArrayToSend.add(listOfBeerOutlets.get(i).beerOutletJSONObject);            
-        }
-        
-        return jsonArrayToSend;
-    }
+    
+    
 
 }
