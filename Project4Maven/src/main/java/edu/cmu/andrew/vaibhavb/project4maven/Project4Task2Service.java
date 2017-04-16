@@ -9,10 +9,13 @@ import edu.cmu.andrew.vaibhavb.model.BeerOutlet;
 import edu.cmu.andrew.vaibhavb.model.BeerOutletBusinessLogic;
 import edu.cmu.andrew.vaibhavb.model.database.MongoDB;
 import edu.cmu.andrew.vaibhavb.model.database.MongoTemplate;
+import edu.cmu.andrew.vaibhavb.model.database.SortStringInt;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -25,33 +28,63 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author vabby
  */
-@WebServlet(name = "Project4Task2Service", urlPatterns = {"/Project4Task2Service/*"})
+@WebServlet(name = "Project4Task2Service", urlPatterns = {"/Project4Task2Service/*", "/Project4Task2Service"})
 public class Project4Task2Service extends HttpServlet {
     
     public static MongoDB databaseProxyObject = new MongoDB();
-    public static boolean isClientMobile = false;
+    public static boolean storeInfo = false;
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //Set the mobile flag to true is the device is mobile
-        if(request.getHeader("User-Agent").indexOf("Mobile") != -1) {
-            isClientMobile = true;
-        } 
         
         
-        
-        //set the time when this webservice was hit
-        if(isClientMobile)       
-            databaseProxyObject.setTimeStampWebServiceHit(System.currentTimeMillis());
-//        MongoTemplate.connectToMongo();
-        
+        //set the time when this webservice was hit        
+        databaseProxyObject.setTimeStampWebServiceHit(System.currentTimeMillis());
+
+        //Initialize storing data as false
+        storeInfo = false;
         
         String getQuery = (request.getPathInfo());
         
+        boolean getBeerMappingData = true;
+        if(getQuery == null)
+        {
+            getBeerMappingData = false;
+        }
+        else if(getQuery.indexOf("city=") < 0)
+        {
+            getBeerMappingData = false;
+        }
         
-        String cityName = getQuery.substring(getQuery.indexOf("=")+1);
+        
+        if(!getBeerMappingData) //Not a request from the android client (for beer response), therefore request from the interface client
+        {
+            //Function to do the processing for the display of web analytics dashboard
+            requestTypeWebDashboard(request, response);
+            
+        }
+        else //Request from the android client for beer data
+        {
+            storeInfo = true;
+            //Function to fo the processing for returning back the beer data from beermapping API
+            requestTypeFetchData(request, response);
+            
+        }
+        
+        
+    }
+    
+    private static void requestTypeFetchData(HttpServletRequest request, HttpServletResponse response){
+        
+        String getQuery = (request.getPathInfo());
+//        int indexOfCity = getQuery.indexOf("city=");
+        
+        //Check if this is a fetch data request or web interface request
+        String cityName = getQuery.substring(getQuery.indexOf("city=") + 5); ///////////// UPDATE IN SERVICE 1
+        
+        
         
         int indexOfSpace;
         //handle spaces in the city name
@@ -65,18 +98,18 @@ public class Project4Task2Service extends HttpServlet {
             cityName = "Pittsburgh";
         
         //Set the cityname for which the webservice was hit
-        if(isClientMobile)       
+        if(storeInfo)       
             databaseProxyObject.setCity(cityName);
         
         //Set the timeStamp when the beermapping webservice was requested
-        if(isClientMobile)       
+        if(storeInfo)       
             databaseProxyObject.setTimeStampBeerMappingRequest(System.currentTimeMillis());
         
         //Fetch outlets by the city name
         String beerMappingResponse = BeerOutletBusinessLogic.fetchOutletsByCityName(cityName);
 
         //Set the timeStamp when the beermapping webservice responded with the data        
-        if(isClientMobile)                   
+        if(storeInfo)                   
             databaseProxyObject.setTimeStampBeerMappingResponse(System.currentTimeMillis());
         
         //Reformat the String API response
@@ -93,24 +126,39 @@ public class Project4Task2Service extends HttpServlet {
         //Uses model's subsetBeerOutletsList function for this
         List<BeerOutlet> listOfBeerOutletsFinal = BeerOutlet.subsetBeerOutletsList(listOfBeerOutlets, 0, BeerOutlet.MAX_BEER_OUTLETS);
         
+        //Store the # of results from the beermapping API
+        if(storeInfo)                   
+            databaseProxyObject.setNumberOfOutlets(listOfBeerOutlets.size());
+        
+        
+        
         //Set Response Type
         response.setContentType("application/json;charset=UTF-8");
         
+        int status;
         //HTTP Status Codes
         if(listOfBeerOutletsFinal.size() == 0)
         {
-            response.setStatus(503);
+            status = 503;        
         }
         else
         {
-            response.setStatus(200); 
+            status = 200;                         
         }
+        response.setStatus(status);
+
+        
+        
+        //Store the HTTP Status
+        if(storeInfo)                   
+            databaseProxyObject.setHttpStatusCode(Integer.toString(status));
+        
+        
         
         //Route to setViewAsJson for sending the model data to JSON, and then send it
         setViewAsJson(request, response, listOfBeerOutletsFinal);
 
     }
-    
     
     private static void setViewAsJson(HttpServletRequest request, HttpServletResponse response, List<BeerOutlet> listOfBeerOutlets) {
         
@@ -118,6 +166,7 @@ public class Project4Task2Service extends HttpServlet {
 
         //set the request parameters to the jsp
         request.setAttribute("listOfBeerOutlets", listOfBeerOutlets);
+        request.setAttribute("databaseProxyObject", databaseProxyObject);
 
         //Dispatch to the response page
         request.getRequestDispatcher("/view_make_json.jsp").forward(request, response);
@@ -135,6 +184,41 @@ public class Project4Task2Service extends HttpServlet {
     public String getServletInfo() {
         
         return "Short description";
+    }
+
+    private void requestTypeWebDashboard(HttpServletRequest request, HttpServletResponse response) {
+        
+        List<MongoDB> listRecords = MongoTemplate.fetchDatabase();
+        List<SortStringInt> sortedSetTopCities = MongoTemplate.getTopSearchedCities(listRecords);
+        long averageTimeDel = MongoTemplate.findAvgTimeWebRequest(listRecords);
+        long averageTimeAPI = MongoTemplate.findAvgTimeAPIRequest(listRecords);
+        double averageNumOutlets = MongoTemplate.findAvgNumOutlets(listRecords);
+        double percentSuccessAPI = MongoTemplate.findPercentageAPISuccess(listRecords);
+        
+        
+        //set the request parameters to the jsp
+        request.setAttribute("listRecords", listRecords);
+        request.setAttribute("averageTimeDel", Long.toString(averageTimeDel));
+        request.setAttribute("averageTimeAPI", Long.toString(averageTimeAPI));
+        request.setAttribute("sortedSetTopCities", sortedSetTopCities);        
+        request.setAttribute("averageNumOutlets", Double.toString(averageNumOutlets));        
+        request.setAttribute("percentSuccessAPI", Double.toString(percentSuccessAPI));        
+        
+        setViewAsWebInterface(request, response);
+        
+    }
+
+    private void setViewAsWebInterface(HttpServletRequest request, HttpServletResponse response) {
+        try {        
+
+        //Dispatch to the response page
+        request.getRequestDispatcher("/view_make_web_interface.jsp").forward(request, response);
+        
+        } catch (ServletException ex) {
+            Logger.getLogger(Project4Task2Service.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Project4Task2Service.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     

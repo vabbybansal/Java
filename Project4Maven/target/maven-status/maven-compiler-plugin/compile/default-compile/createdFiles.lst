@@ -1,4 +1,6 @@
 edu\cmu\andrew\vaibhavb\model\BeerOutletBusinessLogic.class
+edu\cmu\andrew\vaibhavb\model\database\MongoDB.class
 edu\cmu\andrew\vaibhavb\model\database\MongoTemplate.class
+edu\cmu\andrew\vaibhavb\model\database\SortStringInt.class
 edu\cmu\andrew\vaibhavb\model\BeerOutlet.class
 edu\cmu\andrew\vaibhavb\project4maven\Project4Task2Service.class

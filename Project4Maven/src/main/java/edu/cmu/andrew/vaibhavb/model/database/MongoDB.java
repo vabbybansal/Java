@@ -4,42 +4,79 @@
  * and open the template in the editor.
  */
 package edu.cmu.andrew.vaibhavb.model.database;
-    
+import java.util.ArrayList;
+import java.util.List;
     
 
-
+ 
 public class MongoDB {
     
-    long timeStampBeerMappingRequest;
-    long timeStampBeerMappingResponse;
-    long timeStampWebServiceHit;
+    String timeStampBeerMappingRequest;
+    String timeStampBeerMappingResponse;
+    String timeStampWebServiceHit;
     String city;
-    String mobileManufacturer;
-    String mobileModel;
-    int numberOfOutlets;
+    String httpStatusCode;
+    String timeStampWebServiceEnd;
+    String numberOfOutlets;
 
-    public long getTimeStampBeerMappingRequest() {
+    
+    
+    
+
+    public MongoDB(String timeStampBeerMappingRequest, String timeStampBeerMappingResponse, String timeStampWebServiceHit, String city, String numberOfOutlets, String httpStatusCode, String timeStampWebServiceEnd) {
+        this.timeStampBeerMappingRequest = timeStampBeerMappingRequest;
+        this.timeStampBeerMappingResponse = timeStampBeerMappingResponse;
+        this.timeStampWebServiceHit = timeStampWebServiceHit;
+        this.city = city;        
+        this.numberOfOutlets = numberOfOutlets;
+        this.httpStatusCode = httpStatusCode;
+        this.timeStampWebServiceEnd = timeStampWebServiceEnd;
+    }
+
+    
+    
+    public MongoDB(long timeStampBeerMappingRequest, long timeStampBeerMappingResponse, long timeStampWebServiceHit, String city, int numberOfOutlets, int httpStatusCode, long timeStampWebServiceEnd) {
+        this.timeStampBeerMappingRequest = Long.toString(timeStampBeerMappingRequest);
+        this.timeStampBeerMappingResponse = Long.toString(timeStampBeerMappingResponse);
+        this.timeStampWebServiceHit = Long.toString(timeStampWebServiceHit);
+        this.city = city;
+        this.httpStatusCode = Integer.toString(httpStatusCode);
+        this.timeStampWebServiceEnd = Long.toString(timeStampWebServiceEnd);
+        this.numberOfOutlets = Integer.toString(numberOfOutlets);
+    }
+
+    @Override
+    public String toString() {
+        return "MongoDB{" + "timeStampBeerMappingRequest=" + timeStampBeerMappingRequest + ", timeStampBeerMappingResponse=" + timeStampBeerMappingResponse + ", timeStampWebServiceHit=" + timeStampWebServiceHit + ", city=" + city + ", httpStatusCode=" + httpStatusCode + ", timeStampWebServiceEnd=" + timeStampWebServiceEnd + ", numberOfOutlets=" + numberOfOutlets + '}';
+    }
+
+    public MongoDB() {
+    }
+    
+    
+    
+    public String getTimeStampBeerMappingRequest() {
         return timeStampBeerMappingRequest;
     }
 
     public void setTimeStampBeerMappingRequest(long timeStampBeerMappingRequest) {
-        this.timeStampBeerMappingRequest = timeStampBeerMappingRequest;
+        this.timeStampBeerMappingRequest = Long.toString(timeStampBeerMappingRequest);
     }
 
-    public long getTimeStampBeerMappingResponse() {
+    public String getTimeStampBeerMappingResponse() {
         return timeStampBeerMappingResponse;
     }
 
     public void setTimeStampBeerMappingResponse(long timeStampBeerMappingResponse) {
-        this.timeStampBeerMappingResponse = timeStampBeerMappingResponse;
+        this.timeStampBeerMappingResponse = Long.toString(timeStampBeerMappingResponse);
     }
 
-    public long getTimeStampWebServiceHit() {
+    public String getTimeStampWebServiceHit() {
         return timeStampWebServiceHit;
     }
 
     public void setTimeStampWebServiceHit(long timeStampWebServiceHit) {
-        this.timeStampWebServiceHit = timeStampWebServiceHit;
+        this.timeStampWebServiceHit = Long.toString(timeStampWebServiceHit);
     }
 
     public String getCity() {
@@ -50,28 +87,28 @@ public class MongoDB {
         this.city = city;
     }
 
-    public String getMobileManufacturer() {
-        return mobileManufacturer;
+    public String getHttpStatusCode() {
+        return httpStatusCode;
     }
 
-    public void setMobileManufacturer(String mobileManufacturer) {
-        this.mobileManufacturer = mobileManufacturer;
+    public void setHttpStatusCode(String httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
     }
 
-    public String getMobileModel() {
-        return mobileModel;
+    public String getTimeStampWebServiceEnd() {
+        return timeStampWebServiceEnd;
     }
 
-    public void setMobileModel(String mobileModel) {
-        this.mobileModel = mobileModel;
+    public void setTimeStampWebServiceEnd(String timeStampWebServiceEnd) {
+        this.timeStampWebServiceEnd = timeStampWebServiceEnd;
     }
 
-    public int getNumberOfOutlets() {
+    public String getNumberOfOutlets() {
         return numberOfOutlets;
     }
 
     public void setNumberOfOutlets(int numberOfOutlets) {
-        this.numberOfOutlets = numberOfOutlets;
+        this.numberOfOutlets = Integer.toString(numberOfOutlets);
     }
     
     
