@@ -9,8 +9,10 @@ import java.util.List;
     
 
  
+//MongoDB logical schema
 public class MongoDB {
     
+    //Create Logging data variables
     String timeStampBeerMappingRequest;
     String timeStampBeerMappingResponse;
     String timeStampWebServiceHit;
@@ -22,7 +24,7 @@ public class MongoDB {
     
     
     
-
+    //Constructors
     public MongoDB(String timeStampBeerMappingRequest, String timeStampBeerMappingResponse, String timeStampWebServiceHit, String city, String numberOfOutlets, String httpStatusCode, String timeStampWebServiceEnd) {
         this.timeStampBeerMappingRequest = timeStampBeerMappingRequest;
         this.timeStampBeerMappingResponse = timeStampBeerMappingResponse;
@@ -54,7 +56,7 @@ public class MongoDB {
     }
     
     
-    
+    //Setters and Getters
     public String getTimeStampBeerMappingRequest() {
         return timeStampBeerMappingRequest;
     }

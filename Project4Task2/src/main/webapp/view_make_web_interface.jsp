@@ -50,7 +50,7 @@
             for(int i=0; i<Math.min(count, maxTop); i++)
             {                                
                 topCitiesHtml.append("<div><div>"
-                        + sortedSetTopCities.get(i).key
+                        + sortedSetTopCities.get(i).key.toString().replaceAll("%20", " ")
                         + "</div><div>"
                         + sortedSetTopCities.get(i).Value
                         + "</div></div>");                

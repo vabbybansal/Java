@@ -49,6 +49,8 @@ public class Project4Task2Service extends HttpServlet {
         String getQuery = (request.getPathInfo());
         
         boolean getBeerMappingData = true;
+        
+        //Handle empty query
         if(getQuery == null)
         {
             getBeerMappingData = false;
@@ -95,7 +97,7 @@ public class Project4Task2Service extends HttpServlet {
         
         //If query is empty
         if(cityName.length() == 0)
-            cityName = "Pittsburgh";
+            cityName = "";
         
         //Set the cityname for which the webservice was hit
         if(storeInfo)       
@@ -160,6 +162,7 @@ public class Project4Task2Service extends HttpServlet {
 
     }
     
+    //Set view as JSON (data from external API)
     private static void setViewAsJson(HttpServletRequest request, HttpServletResponse response, List<BeerOutlet> listOfBeerOutlets) {
         
         try {
@@ -188,6 +191,7 @@ public class Project4Task2Service extends HttpServlet {
 
     private void requestTypeWebDashboard(HttpServletRequest request, HttpServletResponse response) {
         
+        //Calculate the analytics and logging from the model
         List<MongoDB> listRecords = MongoTemplate.fetchDatabase();
         List<SortStringInt> sortedSetTopCities = MongoTemplate.getTopSearchedCities(listRecords);
         long averageTimeDel = MongoTemplate.findAvgTimeWebRequest(listRecords);
@@ -204,10 +208,13 @@ public class Project4Task2Service extends HttpServlet {
         request.setAttribute("averageNumOutlets", Double.toString(averageNumOutlets));        
         request.setAttribute("percentSuccessAPI", Double.toString(percentSuccessAPI));        
         
+        //Set View
         setViewAsWebInterface(request, response);
         
     }
 
+    
+    //Set view as web dashboard
     private void setViewAsWebInterface(HttpServletRequest request, HttpServletResponse response) {
         try {        
 

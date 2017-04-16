@@ -20,45 +20,22 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.bson.Document;
 
+//Class to create model functions for interacting with the MongoDB Database
 public class MongoTemplate {
     
-    public static void connectToMongo(){
-        
-
-//        mongodb://vaibhavbansal:beerit@ds159670.mlab.com:59670/beerit
-        MongoClientURI uri  = new MongoClientURI("mongodb://vaibhavbansal:beerit@ds159670.mlab.com:59670/beerit"); 
-        MongoClient client = new MongoClient(uri);
-        MongoDatabase db = client.getDatabase(uri.getDatabase());
-        
-        List<Document> seedData = new ArrayList<Document>();
-
-        seedData.add(new Document("decade", "1970s")
-            .append("artist", "Debby Boone")
-            .append("song", "You Light Up My Life")
-            .append("weeksAtOne", 10)
-        );
-
-
-        
-        //Fetch the collection
-        MongoCollection<Document> songs = db.getCollection("");
-        songs.insertMany(seedData);
-     
-        
-        
-        client.close();
-        
-    }
-
+   //Function to write data onto Mongo
     public static void logThisHit(MongoDB databaseProxyObject) {
 
 //                mongodb://vaibhavbansal:beerit@ds159670.mlab.com:59670/beerit
+    
+        //Create MongoConnection
         MongoClientURI uri  = new MongoClientURI("mongodb://vaibhavbansal:beerit@ds159670.mlab.com:59670/beerit"); 
         MongoClient client = new MongoClient(uri);
         MongoDatabase db = client.getDatabase(uri.getDatabase());
         
         List<Document> seedData = new ArrayList<Document>();
 
+        //Set the data in a local list
         seedData.add(
             new Document("city", databaseProxyObject.city)
             .append("numberOfOutlets", databaseProxyObject.numberOfOutlets)
@@ -72,20 +49,19 @@ public class MongoTemplate {
         
         //Fetch the collection
         MongoCollection<Document> songs = db.getCollection("interactionlog");
+        //Insert data into Mongo collection
         songs.insertMany(seedData);
-     
-        
-        
+             
         client.close();
-        
-
         
     }
     
+    //Read data from Mongo Database
     public static List<MongoDB> fetchDatabase(){
         
         List<MongoDB> listReadDB = new ArrayList<MongoDB>();
         
+        //Create Mongo Connection
         MongoClientURI uri  = new MongoClientURI("mongodb://vaibhavbansal:beerit@ds159670.mlab.com:59670/beerit"); 
         MongoClient client = new MongoClient(uri);
         MongoDatabase db = client.getDatabase(uri.getDatabase());
@@ -97,7 +73,6 @@ public class MongoTemplate {
         MongoDB readMongoDBRecord;
         Document iterDoc = new Document();
         
-//        System.out.println("Printing all records");
         
         //find iterator of the cursor of records associated with this collection (table)
         MongoCursor<Document> cursor = collection.find().iterator();
@@ -123,6 +98,7 @@ public class MongoTemplate {
         return listReadDB;
     }
     
+    //Create top searched cities (sorting on frequency of searches)
     public static List<SortStringInt> getTopSearchedCities(List<MongoDB> listRecords){
         
         Map<String, Integer> topSearchedCities = new HashMap<String, Integer>();
@@ -130,6 +106,7 @@ public class MongoTemplate {
         int size = listRecords.size();
         String city;
         
+        //Put data in hashmap for aggregation of searches
         for(i = 0; i<size; i++)
         {
             city = listRecords.get(i).city;
@@ -142,7 +119,6 @@ public class MongoTemplate {
         List<SortStringInt> listSort = new ArrayList<SortStringInt>();
         SortStringInt tempRec = new SortStringInt();
         //Create List for sorting
-//        List<String, Integer> sortedList = new ArrayList<String, Integer>();
         Iterator it = topSearchedCities.entrySet().iterator();
             while (it.hasNext()) {
                 Entry<String, Integer> pair = (Entry<String, Integer>) it.next();
@@ -150,15 +126,13 @@ public class MongoTemplate {
                 listSort.add(tempRec);
             }
             Collections.sort(listSort);
-        
-        
-//        SortedSet<Map.Entry<String, Integer>> sortedSet= fetchSortedSetByValDescend(topSearchedCities);
+               
         return listSort;
         
     }
 
 
-    
+    //Find average time to serve request
     public static long findAvgTimeWebRequest(List<MongoDB> listRecords){
         
         int size = listRecords.size();
@@ -176,6 +150,7 @@ public class MongoTemplate {
         return timeDel;
     }
     
+    //Find average time to fetch results from the external API
     public static long findAvgTimeAPIRequest(List<MongoDB> listRecords){
         
         int size = listRecords.size();
@@ -192,42 +167,43 @@ public class MongoTemplate {
         
         return timeDel;
     }
-    
-        public static double findAvgNumOutlets(List<MongoDB> listRecords){
-        
-            int size = listRecords.size();
 
-            //Calculate the total timedelay
-            int avgOut = 0;
-            for(int i=0; i<size; i++)
-            {
-                avgOut += Integer.parseInt(listRecords.get(i).numberOfOutlets);
-            }
+    //Find average number of outlets returned from the external API
+    public static double findAvgNumOutlets(List<MongoDB> listRecords){
 
-            //Calculate average            
-            return ((double) avgOut/size);
+        int size = listRecords.size();
+
+        //Calculate the total timedelay
+        int avgOut = 0;
+        for(int i=0; i<size; i++)
+        {
+            avgOut += Integer.parseInt(listRecords.get(i).numberOfOutlets);
         }
-        
-        
-        
-        public static double findPercentageAPISuccess(List<MongoDB> listRecords){
-        
-            int size = listRecords.size();
 
-            //Calculate the total timedelay
-            int count = 0;
-            for(int i=0; i<size; i++)
+        //Calculate average            
+        return ((double) avgOut/size);
+    }
+
+
+    //Find the  percentage of API results that were successful till now
+    public static double findPercentageAPISuccess(List<MongoDB> listRecords){
+
+        int size = listRecords.size();
+
+        //Calculate the total timedelay
+        int count = 0;
+        for(int i=0; i<size; i++)
+        {
+            if(Integer.parseInt(listRecords.get(i).httpStatusCode) == 200)
             {
-                if(Integer.parseInt(listRecords.get(i).httpStatusCode) == 200)
-                {
-                    count++;
-                }
+                count++;
             }
-
-            //Calculate average            
-            return ((double) count/size*100);
         }
-        
+
+        //Calculate average            
+        return ((double) count/size*100);
+    }
+
     
 }
 

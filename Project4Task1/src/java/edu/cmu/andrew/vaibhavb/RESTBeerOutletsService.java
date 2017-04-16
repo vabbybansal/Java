@@ -40,8 +40,17 @@ public class RESTBeerOutletsService extends HttpServlet {
         
         String getQuery = (request.getPathInfo());
         
+        String cityName;
+        //Handle empty query
+        if(getQuery != null)
+        {
+            cityName = getQuery.substring(getQuery.indexOf("=")+1);    
+        }
+        else
+        {
+            cityName = "";
+        }
         
-        String cityName = getQuery.substring(getQuery.indexOf("=")+1);
         
         int indexOfSpace;
         //handle spaces in the city name
@@ -55,7 +64,7 @@ public class RESTBeerOutletsService extends HttpServlet {
         
         //If query is empty
         if(cityName.length() == 0)
-            cityName = "Pittsburgh";
+            cityName = "";
         
         //Fetch outlets by the city name
         String beerMappingResponse = BeerOutletBusinessLogic.fetchOutletsByCityName(cityName);

@@ -9,6 +9,8 @@ package edu.cmu.andrew.vaibhavb.model.database;
  *
  * @author vabby
  */
+
+//Helper class to sort <String, Integer> according to the <Integer>
 public class SortStringInt implements Comparable{
     
     public String key;
