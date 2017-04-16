@@ -60,8 +60,6 @@ public class RESTBeerOutletsService extends HttpServlet {
         }
         
         
-        
-        
         //If query is empty
         if(cityName.length() == 0)
             cityName = "";
