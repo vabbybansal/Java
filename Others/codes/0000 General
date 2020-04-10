@@ -1,0 +1,10 @@
+# As you write the differeent subsections of the algorithm, keep writing the Big O for each subsection. Makes it interesting, more involved, cool and fast to find blockers
+# For all question types, possible test cases / scenarios:
+    # Empty input
+    # Multiple Solutions
+    # Array questions
+        # While brainstorming for tests / scenarios, do not forget to consider negative numbers / zeros etc
+# Recursion Basic Format
+    # Validity
+    # Base Case
+    # Navigate - recurse
